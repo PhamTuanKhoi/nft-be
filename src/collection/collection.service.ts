@@ -10,6 +10,7 @@ import { ID } from '../global/interfaces/id.interface';
 import { ConfigService } from '@nestjs/config';
 import { ContractService } from 'src/nft/contracts/contract.service';
 import { NftStandardEnum } from '../nft/interfaces/nftStandard.enum';
+import { QueryNFTDto } from 'src/nft/dtos/queryNFT.dto';
 
 @Injectable()
 export class CollectionService {
@@ -132,5 +133,37 @@ export class CollectionService {
       $or: [{ creator: creatorId }, { public: true }],
       chainId,
     });
+  }
+  async findCollectionSales() {
+    const findQuery = await this.model.aggregate([
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'creator',
+          foreignField: '_id',
+          as: 'creator',
+        },
+      },
+      { 
+        $unwind: '$creator'
+      }, 
+       {
+        $lookup: {
+          from: "sales",
+          localField: "creator._id",
+          foreignField: "seller",
+          as: "sales",
+        }
+      }, 
+      {
+        $lookup: {
+          from: "nfts",
+          localField: "sales.nft",
+          foreignField: "_id",
+          as: "nfts",
+        }
+      }
+    ])
+    return findQuery;
   }
 }

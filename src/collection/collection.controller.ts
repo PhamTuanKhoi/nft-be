@@ -24,6 +24,7 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { QueryNFTDto } from 'src/nft/dtos/queryNFT.dto';
 
 @ApiBearerAuth()
 @ApiTags('Collection')
@@ -34,6 +35,11 @@ export class CollectionController {
   @Get()
   async index(@Query() query: QueryCollectionDto) {
     return await this.service.findAll(query);
+  }
+
+  @Get('sales')
+  async conlectionBySales() {
+    return await this.service.findCollectionSales();
   }
 
   @Get(':id')
@@ -71,4 +77,6 @@ export class CollectionController {
   ) {
     return await this.service.update(id, payload);
   }
+
+
 }
