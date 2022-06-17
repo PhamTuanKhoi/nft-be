@@ -158,11 +158,11 @@ export class CollectionService {
       {
         $lookup: {
           from: "nfts",
-          localField: "sales.nft",
-          foreignField: "_id",
+          localField: "address",
+          foreignField: "tokenAddress",
           as: "nfts",
         }
-      }
+      },
     ])
     return findQuery;
   }
