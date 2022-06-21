@@ -163,6 +163,19 @@ export class CollectionService {
           as: "nfts",
         }
       },
+      // nfts.length
+      {
+        $addFields: {
+          "lengthNfts": {$size: "$nfts"}
+       }
+      },
+      {
+        $match: { 
+          "lengthNfts": {
+            $gt: 3
+          }
+        }
+      }
     ])
     return findQuery;
   }
