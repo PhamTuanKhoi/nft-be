@@ -20,8 +20,8 @@ export class EventController {
   }
 
   @Get('activity')
-  async activity(@Query('page') page = 1, @Query('limit') limit = 10) {
-    return await this.service.activity(page, limit);
+  async activity(@Query('page') page = 1, @Query('limit') limit = 10, @Query() query) {
+    return await this.service.activity(page, limit, query);
   }
 
   @Get('ranking/user')

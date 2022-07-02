@@ -114,8 +114,44 @@ export class EventService {
         return this.model.findByIdAndRemove(id);
     }
 
-    async activity(page: number, limit: number) {
-        const findQuery = this.model.aggregate([
+    async activity(page: number, limit: number, query: any) {
+        const typeFilter = query.typeFilter;
+        let matchTypeFilter: any;
+        switch (typeFilter) {
+            case "Bids":
+                matchTypeFilter = {
+                    $match: {
+                        name: "BidAdded"
+                    }
+                }
+                break;
+            case "Listings":
+                matchTypeFilter = {
+                    $match: {
+                        name: "ItemUpdated"
+                    }
+                }
+                break;
+            case "Purchases":
+                matchTypeFilter = {
+                    $match: {
+                        name: "Bought"
+                    }
+                }
+                break;
+            case "Sales":
+                matchTypeFilter = {
+                    $match: {
+                        name: "ItemUpdated",
+                        "args._type": 0
+                    }
+                }
+                break;
+            case "":
+                break;
+        }
+
+        let tmp: any = [
             {
                 $match: {
                     name: { $ne: 'TransferSingle' }
@@ -193,7 +229,15 @@ export class EventService {
             {
                 $sort: { createdAt: -1 }
             }
-        ]);
+        ]
+
+        if (matchTypeFilter) {
+            tmp = [
+                matchTypeFilter,
+                ...tmp
+            ]
+        }
+        const findQuery = this.model.aggregate(tmp);
         const count = (await findQuery.exec()).length;
         const all = await findQuery.exec();
         const result = all.slice(0, page * limit);
