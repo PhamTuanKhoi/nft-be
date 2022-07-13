@@ -21,15 +21,13 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { NftService } from 'src/nft/nft.service';
 
 @ApiBearerAuth()
 @ApiTags('USER')
 @Controller('users')
 export class UserController {
   constructor(
-    private readonly service: UserService,
-    private readonly nftService: NftService,
+    private readonly service: UserService, 
   ) {}
 
   @Get()
@@ -44,7 +42,7 @@ export class UserController {
   })
   @ApiParam({ name: 'id' })
   async getNfts(@Param('id', ParseIdPipe) id: ID, @Query() query: ListNftDto) {
-    return await this.nftService.findByUser(id, query.type);
+    return
   }
 
   @Get(':id')

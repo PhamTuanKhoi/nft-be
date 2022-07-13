@@ -13,7 +13,6 @@ import { ethers } from 'ethers';
 import { UserStatusEnum } from './interfaces/userStatus.enum';
 import { v4 as uuidv4 } from 'uuid';
 import { UserRoleEnum } from './interfaces/userRole.enum';
-import { SaleType } from 'src/nft/interfaces/saleType.enum';
 
 @Injectable()
 export class UserService {
@@ -52,7 +51,7 @@ export class UserService {
         pipeline: [
           {
             $match: {
-              saleType: SaleType.AUCTION
+              saleType: 1
             }
           }
         ],
