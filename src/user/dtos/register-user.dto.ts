@@ -1,46 +1,25 @@
 import { Type } from 'class-transformer';
-import { IsBoolean, IsEnum, IsOptional, Length } from 'class-validator';
-import { UserRoleEnum } from '../interfaces/userRole.enum';
-import { UserStatusEnum } from '../interfaces/userStatus.enum';
+import { IsEmail, IsOptional, IsString, Length } from 'class-validator';
+
 
 export class RegisterUserDto {
+  @IsEmail()
+  @Type(() => String)
+  email: string;
+
+  @IsString()
+  @Type(() => String)
   @Length(2, 100)
   username: string;
 
+  @IsString()
+  @Type(() => String)
   @Length(4, 30)
   password: string;
 
   @IsOptional()
+  @IsString()
+  @Type(() => String)
   @Length(4, 30)
-  title: string;
-
-  @IsOptional()
-  @IsEnum(UserStatusEnum)
-  status: UserStatusEnum = UserStatusEnum.ACTIVE;
-
-  @IsOptional()
-  avatar: string;
-
-  @IsOptional()
-  cover: string;
-
-  @IsOptional()
-  address: string;
-
-  @IsOptional()
-  bio: string;
-
-  @IsOptional()
-  links: unknown;
-
-  @IsEnum(UserRoleEnum)
-  role = UserRoleEnum.USER;
-
-  @IsBoolean()
-  @Type(() => Boolean)
-  isCreator = false;
-
-  @IsBoolean()
-  @Type(() => Boolean)
-  feature = false;
+  displayName: string;
 }

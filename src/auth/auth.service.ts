@@ -50,7 +50,7 @@ export class AuthService {
     const user = await this.usersService.findOneByUsername(username);
     const payload: JwtPayload = {
       username: user.username,
-      id: user.id,
+      id: user._id,
       address: user.address,
     };
     return {
@@ -91,45 +91,19 @@ export class AuthService {
 
     if (!user)
       throw new HttpException('User does not exist', HttpStatus.NOT_FOUND);
-    const token = await this.tokenModel.findOne({ userId: user.id });
+    const token = await this.tokenModel.findOne({ userId: user._id });
     if (token) await token.deleteOne();
     const resetToken = randomBytes(32).toString('hex');
     const hash = await bcrypt.hash(resetToken, 10);
 
     await new this.tokenModel({
-      userId: user.id,
+      userId: user._id,
       token: hash,
       createdAt: Date.now(),
     }).save();
 
     const domain = this.configService.get<string>('FRONTEND_URL');
-    const link = `${domain}/passwordReset?token=${resetToken}&id=${user.id}`;
+    const link = `${domain}/passwordReset?token=${resetToken}&id=${user._id}`;
     //TODO: send email
-  }
-
-  async resetPassword(payload: ResetPasswordDto) {
-    const token = await this.tokenModel.findOne({ userId: payload.userId });
-    if (!token) {
-      throw new HttpException(
-        'Invalid or expired password reset token',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    const isValid = await bcrypt.compare(payload.token, token.token);
-    if (!isValid) {
-      throw new HttpException(
-        'Invalid or expired password reset token',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    await this.usersService.update(payload.userId, {
-      password: payload.password,
-    });
-    await token.deleteOne();
-    return true;
-  }
-
-  async updateProfile(id: ID, payload: UpdateUserDto) {
-    return this.usersService.update(id, payload);
   }
 }

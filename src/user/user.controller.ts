@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { QueryUserDto } from './dtos/query-user.dto';
-import { UpdateUserDto } from './dtos/update-user.dto';
 import { ID } from '../global/interfaces/id.interface';
 import { ParseIdPipe } from '../global/pipes/parseId.pipe';
 import { ListNftDto } from './dtos/listNft.dto';
@@ -30,6 +29,8 @@ export class UserController {
     private readonly service: UserService, 
   ) {}
 
+  // get all user
+  // GET: /v1/users/
   @Get()
   async index(@Query() query: QueryUserDto) {
     return await this.service.findAll(query);
@@ -58,32 +59,6 @@ export class UserController {
   @Delete(':id')
   async remove(@Param('id', ParseIdPipe) id: ID) {
     return await this.service.remove(id);
-  }
-
-  @Patch(':a/follow/:b')
-  async follow(@Param('a', ParseIdPipe) a: ID, @Param('b', ParseIdPipe) b: ID) {
-    return await this.service.follow(a, b);
-  }
-
-  @Patch(':a/unfollow/:b')
-  async unFollow(
-    @Param('a', ParseIdPipe) a: ID,
-    @Param('b', ParseIdPipe) b: ID,
-  ) {
-    return await this.service.unFollow(a, b);
-  }
-
-  @Patch(':id')
-  async update(
-    @Param('id', ParseIdPipe) id: ID,
-    @Body() payload: UpdateUserDto,
-  ) {
-    return await this.service.update(id, payload);
-  }
-
-  @Patch()
-  async createOrUpdate(@Body() payload: UpdateUserDto) {
-    return await this.service.createOrUpdate(payload);
   }
 
   @Get('/address/:address')

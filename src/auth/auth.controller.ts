@@ -39,22 +39,10 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('profile')
-  async updateProfile(
-    @Auth() auth: JwtPayload,
-    @Body() profile: UpdateUserDto,
-  ) {
-    return await this.service.updateProfile(auth.id, profile);
-  }
 
   @Post('reset_request')
   async requestReset(@Body() payload: ResetRequestDto) {
     await this.service.resetRequest(payload.email);
     return 'Email was sent';
-  }
-
-  @Post('reset_password')
-  async resetPassword(@Body() payload: ResetPasswordDto) {
-    await this.service.resetPassword(payload);
-    return 'Reset password successfully';
   }
 }

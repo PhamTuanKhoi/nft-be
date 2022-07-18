@@ -1,8 +1,6 @@
 import { prop, Ref } from '@typegoose/typegoose';
 import { Exclude } from 'class-transformer';
 import { BaseModel } from '../../global/base.model';
-import { UserRoleEnum } from '../interfaces/userRole.enum';
-import { UserStatusEnum } from '../interfaces/userStatus.enum';
 
 export class User extends BaseModel {
   @prop()
@@ -15,45 +13,12 @@ export class User extends BaseModel {
   @prop()
   email: string;
 
-  @prop()
-  title: string;
+  @prop({default: "Unnamed"})
+  displayName: string;
 
   @prop()
-  status: UserStatusEnum;
+  nonce: string;
 
   @prop()
   address: string;
-
-  @prop()
-  avatar: string;
-
-  @prop()
-  cover: string;
-
-  @prop()
-  bio: string;
-
-  @prop()
-  links: unknown;
-
-  @prop({ default: UserRoleEnum.USER })
-  role: UserRoleEnum;
-
-  @prop({ default: true })
-  isCreator: boolean;
-
-  @prop({ ref: () => User })
-  followeds: Ref<User>[];
-
-  @prop({ ref: () => User })
-  followers: Ref<User>[];
-
-  @prop({ type: String })
-  nonce: string;
-
-  @prop({ default: false })
-  verified: false
-
-  @prop({ default: false })
-  feature: boolean;
 }

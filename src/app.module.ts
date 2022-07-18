@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { TypegooseModule } from 'nestjs-typegoose';
 import { UploadModule } from './upload/upload.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { NftModule } from './nft/nft.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -15,6 +16,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     UserModule,
     AuthModule,
     UploadModule,
+    NftModule
   ],
   controllers: [AppController],
   providers: [AppService],
