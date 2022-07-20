@@ -13,7 +13,6 @@ import { ethers } from 'ethers';
 import { UserStatusEnum } from './interfaces/userStatus.enum';
 import { v4 as uuidv4 } from 'uuid';
 import { UserRoleEnum } from './interfaces/userRole.enum';
-import { SaleType } from 'src/nft/interfaces/saleType.enum';
 
 @Injectable()
 export class UserService {
@@ -24,9 +23,9 @@ export class UserService {
   async findAll(query: QueryUserDto): Promise<PaginateResponse<User>> {
 
     const page = query.page ? query.page * 1 : 1
-    const size = query.size ? query.size * 1 : 10;
+    const size = query.limit ? query.limit * 1 : 10;
     const sortBy = query.sortBy
-    const sortType = query.sortType === "desc" ? -1 : 1
+    const sortType = query.sortType === -1 ? -1 : 1
     console.log("Query", query)
     let tmp = [];
 
@@ -52,7 +51,7 @@ export class UserService {
         pipeline: [
           {
             $match: {
-              saleType: SaleType.AUCTION
+              saleType: 0
             }
           }
         ],
@@ -109,7 +108,7 @@ export class UserService {
         lengthNft: { $cond: { if: { $isArray: "$nft" }, then: { $size: "$nft" }, else: 0 } },
         lengthAuction: { $cond: { if: { $isArray: "$auction" }, then: { $size: "$auction" }, else: 0 } },
         lengthCollection: { $cond: { if: { $isArray: "$collection" }, then: { $size: "$collection" }, else: 0 } },
-        feature: {$ifNull: ['$feature', false]}
+        feature: { $ifNull: ['$feature', false] }
       }
     }
     ]
@@ -156,7 +155,7 @@ export class UserService {
       items: result,
       paginate: {
         page,
-        size,
+        limit: size,
         count,
       },
     };
