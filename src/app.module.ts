@@ -6,13 +6,8 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { TypegooseModule } from 'nestjs-typegoose';
 import { UploadModule } from './upload/upload.module';
-import { NftModule } from './nft/nft.module';
-import { EventModule } from './event/event.module';
-import { CategoryModule } from './category/category.module';
-import { CollectionModule } from './collection/collection.module';
-import { ActivityModule } from './activity/activity.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { CommentModule } from './comment/comment.module';
+import { NftModule } from './nft/nft.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -21,12 +16,7 @@ import { CommentModule } from './comment/comment.module';
     UserModule,
     AuthModule,
     UploadModule,
-    NftModule,
-    EventModule,
-    CategoryModule,
-    CollectionModule,
-    ActivityModule,
-    CommentModule
+    NftModule
   ],
   controllers: [AppController],
   providers: [AppService],

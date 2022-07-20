@@ -13,7 +13,6 @@ import { QueryUserDto } from './dtos/query-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { ID } from '../global/interfaces/id.interface';
 import { ParseIdPipe } from '../global/pipes/parseId.pipe';
-import { ListNftDto } from './dtos/listNft.dto';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -21,16 +20,13 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { NftService } from 'src/nft/nft.service';
-
 @ApiBearerAuth()
 @ApiTags('USER')
 @Controller('users')
 export class UserController {
   constructor(
     private readonly service: UserService,
-    private readonly nftService: NftService,
-  ) {}
+  ) { }
 
   @Get()
   async index(@Query() query: QueryUserDto) {
@@ -42,10 +38,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
   })
-  @ApiParam({ name: 'id' })
-  async getNfts(@Param('id', ParseIdPipe) id: ID, @Query() query: ListNftDto) {
-    return await this.nftService.findByUser(id, query.type);
-  }
+
 
   @Get(':id')
   @ApiOperation({ summary: 'get profile by ID' })
@@ -98,5 +91,5 @@ export class UserController {
     return await this.service.generateOnceFromAddress(payload.address);
   }
 
-  
+
 }
