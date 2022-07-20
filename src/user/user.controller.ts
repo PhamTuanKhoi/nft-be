@@ -97,6 +97,4 @@ export class UserController {
   async getNonce(@Body() payload: { address: string }) {
     return await this.service.generateOnceFromAddress(payload.address);
   }
-
-  
 }
