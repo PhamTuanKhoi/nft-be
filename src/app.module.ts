@@ -9,6 +9,7 @@ import { UploadModule } from './upload/upload.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { NftModule } from './nft/nft.module';
 import { CollectionModule } from './collection/collection.module';
+import { MiningModule } from './mining/mining.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -19,6 +20,7 @@ import { CollectionModule } from './collection/collection.module';
     UploadModule,
     NftModule,
     CollectionModule,
+    MiningModule,
   ],
   controllers: [AppController],
   providers: [AppService],

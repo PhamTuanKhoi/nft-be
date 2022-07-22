@@ -1,20 +1,20 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { ID } from 'src/global/interfaces/id.interface';
 import { PaginateResponse } from 'src/global/interfaces/paginate.interface';
-import { CreateNftDto } from './dtos/create-nft.dto';
-import { QueryNftDto } from './dtos/query-nft.dto';
-import { UpdateNftDto } from './dtos/update-nft.dto';
-import { NFT } from './schema/nft.schema';
+import { CreateMiningDto } from './dtos/create-mining.dto';
+import { QueryMiningDto } from './dtos/query-mining.dto';
+import { UpdateMiningDto } from './dtos/update-mining.dto';
+import { Mining } from './schema/mining.schema';
 
 @Injectable()
-export class NftService {
+export class MiningService {
   constructor(
-    @InjectModel(NFT) private readonly model: ReturnModelType<typeof NFT>,
+    @InjectModel(Mining) private readonly model: ReturnModelType<typeof Mining>,
   ) {}
 
-  get = async (query: QueryNftDto): Promise<PaginateResponse<NFT>> => {
+  get = async (query: QueryMiningDto): Promise<PaginateResponse<Mining>> => {
     let tmp = [];
     if (query.search !== undefined && query.search.length > 0) {
       tmp = [
@@ -22,26 +22,6 @@ export class NftService {
         {
           $match: {
             name: { $regex: '.*' + query.search + '.*', $options: 'i' },
-          },
-        },
-      ];
-    }
-    if (query.fileType !== undefined && query.fileType.length > 0) {
-      tmp = [
-        ...tmp,
-        {
-          $match: {
-            fileType: query.fileType,
-          },
-        },
-      ];
-    }
-    if (query.endTime) {
-      tmp = [
-        ...tmp,
-        {
-          $match: {
-            endTime: { $gt: new Date().getTime() },
           },
         },
       ];
@@ -77,26 +57,23 @@ export class NftService {
     };
   };
 
-  getById = async (id: ID): Promise<NFT> => {
+  getById = async (id: ID): Promise<Mining> => {
     return this.model.findById(id);
   };
 
-  create = async (nft: CreateNftDto): Promise<NFT> => {
+  getByLevel = async (level: number): Promise<Mining> => {
+    return this.model.findOne({ level: level });
+  };
+
+  create = async (nft: CreateMiningDto): Promise<Mining> => {
     return await this.model.create(nft);
   };
 
-  update = async (id: ID, nft: UpdateNftDto): Promise<NFT> => {
+  update = async (id: ID, nft: UpdateMiningDto): Promise<Mining> => {
     return await this.model.findByIdAndUpdate(id, nft, { new: true });
   };
 
-  delete = async (id: ID): Promise<NFT> => {
-    const idNft = await this.model.findById(id);
-    if (idNft.level > 1) {
-      throw new HttpException(
-        "Can't not delete NFT great than 1",
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+  delete = async (id: ID): Promise<Mining> => {
     return await this.model.findByIdAndDelete(id);
   };
 }
