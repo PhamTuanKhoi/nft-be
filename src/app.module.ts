@@ -8,6 +8,7 @@ import { TypegooseModule } from 'nestjs-typegoose';
 import { UploadModule } from './upload/upload.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { NftModule } from './nft/nft.module';
+import { CollectionModule } from './collection/collection.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -16,9 +17,10 @@ import { NftModule } from './nft/nft.module';
     UserModule,
     AuthModule,
     UploadModule,
-    NftModule
+    NftModule,
+    CollectionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

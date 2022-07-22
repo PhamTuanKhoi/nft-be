@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { ID } from 'src/global/interfaces/id.interface';
@@ -80,10 +80,13 @@ export class NftService {
   };
 
   delete = async (id: ID): Promise<NFT> => {
-    const idLevel = await this.model.findById(id);
-    // if (idLevel.level > 1) {
-    //   console.log('err');
-    // }
+    const idNft = await this.model.findById(id);
+    if (idNft.level > 1) {
+      throw new HttpException(
+        "Can't not delete NFT great than 1",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     return await this.model.findByIdAndDelete(id);
   };
 }

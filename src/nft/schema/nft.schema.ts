@@ -17,7 +17,7 @@ export class NFT {
   @prop({ ref: () => User, required: true })
   creator: Ref<User>;
 
-  @prop({ ref: () => User })
+  @prop({ ref: () => User, required: true })
   owner: Ref<User>;
 
   @prop({ default: 1 })
