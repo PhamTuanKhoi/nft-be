@@ -18,7 +18,7 @@ import { UserRoleEnum } from './interfaces/userRole.enum';
 export class UserService {
   constructor(
     @InjectModel(User) private readonly model: ReturnModelType<typeof User>,
-  ) { }
+  ) {}
 
   async findAll(query: QueryUserDto): Promise<PaginateResponse<User>> {
     let tmp = [];
@@ -26,14 +26,21 @@ export class UserService {
       ...tmp,
       {
         $sort: {
-          [query.sortBy]: query.sortType
-        }
-      }
-    ]
+          [query.sortBy]: query.sortType,
+        },
+      },
+    ];
     let findQuery = this.model.aggregate(tmp);
     const count = (await findQuery.exec()).length;
-    if (query.limit !== undefined && query.page !== undefined && query.limit > 0 && query.page > 0) {
-      findQuery = findQuery.limit(query.limit).skip((query.page - 1) * query.limit);
+    if (
+      query.limit !== undefined &&
+      query.page !== undefined &&
+      query.limit > 0 &&
+      query.page > 0
+    ) {
+      findQuery = findQuery
+        .limit(query.limit)
+        .skip((query.page - 1) * query.limit);
     }
     const result = await findQuery.exec();
     return {
@@ -83,10 +90,9 @@ export class UserService {
     return this.model.findByIdAndRemove(id);
   }
 
-  
-
   async findOrCreateByAddress(address: string) {
     let sender = await this.findByAddress(address);
+
     if (!sender) {
       sender = await this.createByAddress(address);
     }
@@ -114,27 +120,27 @@ export class UserService {
     });
   }
 
-  async generateOnceFromAddress(address: string) {
-    const user = await this.findByAddress(address);
-    if (user) {
-      let nonce = crypto.randomBytes(16).toString('base64');
-      nonce = ethers.utils.formatBytes32String(nonce);
-      user.nonce = nonce;
-      await user.save();
-      return nonce;
-    }
+  // async generateOnceFromAddress(address: string) {
+  //   const user = await this.findByAddress(address);
+  //   if (user) {
+  //     let nonce = crypto.randomBytes(16).toString('base64');
+  //     nonce = ethers.utils.formatBytes32String(nonce);
+  //     user.nonce = nonce;
+  //     // await user.save();
+  //     return nonce;
+  //   }
 
-    let nonce = crypto.randomBytes(16).toString('base64');
-    nonce = ethers.utils.formatBytes32String(nonce);
+  //   let nonce = crypto.randomBytes(16).toString('base64');
+  //   nonce = ethers.utils.formatBytes32String(nonce);
 
-    const newUser = new this.model({
-      address: address.toUpperCase(),
-      username: uuidv4(),
-      title: 'Unnamed',
-      status: UserStatusEnum.ACTIVE,
-      nonce,
-    });
-    await newUser.save();
-    return nonce;
-  }
+  //   const newUser = new this.model({
+  //     address: address.toUpperCase(),
+  //     username: uuidv4(),
+  //     title: 'Unnamed',
+  //     status: UserStatusEnum.ACTIVE,
+  //     nonce,
+  //   });
+  //   await newUser.save();
+  //   return nonce;
+  // }
 }

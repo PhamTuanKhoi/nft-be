@@ -1,7 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsEmail, IsOptional, IsString, Length } from 'class-validator';
 
-
 export class RegisterUserDto {
   @IsEmail()
   @Type(() => String)

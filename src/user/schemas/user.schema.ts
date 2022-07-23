@@ -13,7 +13,7 @@ export class User extends BaseModel {
   @prop()
   email: string;
 
-  @prop({default: "Unnamed"})
+  @prop({ default: 'Unnamed' })
   displayName: string;
 
   @prop()

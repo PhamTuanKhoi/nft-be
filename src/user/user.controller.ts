@@ -25,9 +25,7 @@ import {
 @ApiTags('USER')
 @Controller('users')
 export class UserController {
-  constructor(
-    private readonly service: UserService, 
-  ) {}
+  constructor(private readonly service: UserService) {}
 
   // get all user
   // GET: /v1/users/
@@ -43,7 +41,7 @@ export class UserController {
   })
   @ApiParam({ name: 'id' })
   async getNfts(@Param('id', ParseIdPipe) id: ID, @Query() query: ListNftDto) {
-    return
+    return;
   }
 
   @Get(':id')
@@ -68,8 +66,6 @@ export class UserController {
 
   @Post('/nonce')
   async getNonce(@Body() payload: { address: string }) {
-    return await this.service.generateOnceFromAddress(payload.address);
+    return await this.service.findOrCreateByAddress(payload.address);
   }
-
-  
 }

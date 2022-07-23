@@ -50,7 +50,7 @@ export class AuthService {
     const user = await this.usersService.findOneByUsername(username);
     const payload: JwtPayload = {
       username: user.username,
-      id: user._id,
+      id: user.id,
       address: user.address,
     };
     return {
@@ -91,19 +91,19 @@ export class AuthService {
 
     if (!user)
       throw new HttpException('User does not exist', HttpStatus.NOT_FOUND);
-    const token = await this.tokenModel.findOne({ userId: user._id });
+    const token = await this.tokenModel.findOne({ userId: user.id });
     if (token) await token.deleteOne();
     const resetToken = randomBytes(32).toString('hex');
     const hash = await bcrypt.hash(resetToken, 10);
 
     await new this.tokenModel({
-      userId: user._id,
+      userId: user.id,
       token: hash,
       createdAt: Date.now(),
     }).save();
 
     const domain = this.configService.get<string>('FRONTEND_URL');
-    const link = `${domain}/passwordReset?token=${resetToken}&id=${user._id}`;
+    const link = `${domain}/passwordReset?token=${resetToken}&id=${user.id}`;
     //TODO: send email
   }
 }
