@@ -78,7 +78,11 @@ export class NftService {
   };
 
   getById = async (id: ID): Promise<NFT> => {
-    return this.model.findById(id).populate('creator').populate('owner');
+    return this.model
+      .findById(id)
+      .populate('creator')
+      .populate('owner')
+      .populate('collectionNft');
   };
 
   create = async (nft: CreateNftDto): Promise<NFT> => {
@@ -89,7 +93,8 @@ export class NftService {
     return await this.model
       .findByIdAndUpdate(id, nft, { new: true })
       .populate('creator')
-      .populate('owner');
+      .populate('owner')
+      .populate('collectionNft');
   };
 
   delete = async (id: ID): Promise<NFT> => {

@@ -1,4 +1,5 @@
 import { prop, Ref } from '@typegoose/typegoose';
+import { NFT } from 'src/nft/schema/nft.schema';
 import { User } from 'src/user/schemas/user.schema';
 
 export class Collection {
@@ -11,6 +12,12 @@ export class Collection {
   @prop()
   image: string;
 
-  @prop({ ref: () => User, required: true })
+  @prop()
+  banner: string;
+
+  @prop({ ref: () => NFT })
+  nfts: Ref<NFT>[];
+
+  @prop({ ref: () => User })
   creator: Ref<User>;
 }

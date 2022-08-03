@@ -1,20 +1,22 @@
 import { Ref } from '@typegoose/typegoose';
-import { Type } from 'class-transformer';
-import { IsString } from 'class-validator';
+import { IsOptional } from 'class-validator';
 import { BaseModel } from 'src/global/base.model';
+import { NFT } from 'src/nft/schema/nft.schema';
 import { User } from 'src/user/schemas/user.schema';
 
 export class CreateCollectionDto extends BaseModel {
-  @IsString()
+  @IsOptional()
   name: string;
 
-  @IsString()
+  @IsOptional()
   symbol: string;
 
-  @IsString()
+  @IsOptional()
   image: string;
 
-  @Type(() => String)
-  @IsString()
+  @IsOptional()
   creator: Ref<User>;
+
+  @IsOptional()
+  nfts: Ref<NFT>[];
 }

@@ -1,5 +1,6 @@
 import { Ref } from '@typegoose/typegoose';
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Collection } from 'src/collection/schema/collection.schema';
 import { BaseModel } from 'src/global/base.model';
 import { User } from 'src/user/schemas/user.schema';
 
@@ -16,10 +17,13 @@ export class CreateNftDto extends BaseModel {
   @IsOptional()
   description: string;
 
-  @IsString()
+  @IsOptional()
   creator: Ref<User>;
 
-  @IsString()
+  @IsOptional()
+  collectionNft: Ref<Collection>;
+
+  @IsOptional()
   owner: Ref<User>;
 
   @IsOptional()

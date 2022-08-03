@@ -61,7 +61,7 @@ export class CollectionService {
   };
 
   getById = async (id: ID): Promise<Collection> => {
-    return await this.model.findById(id);
+    return await this.model.findById(id).populate('nfts');
   };
 
   create = async (collection: CreateCollectionDto): Promise<Collection> => {
@@ -74,4 +74,8 @@ export class CollectionService {
   ): Promise<Collection> => {
     return await this.model.findByIdAndUpdate(id, collection, { new: true });
   };
+
+  async remove(id: ID): Promise<Collection> {
+    return this.model.findByIdAndRemove(id);
+  }
 }

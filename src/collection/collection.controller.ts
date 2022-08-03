@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -43,5 +44,11 @@ export class CollectionController {
   @Patch(':id')
   async update(@Param('id') id: ID, @Body() collection: UpdateCollectionDto) {
     return this.service.update(id, collection);
+  }
+
+  // DELETE /v1/collections/:id
+  @Delete(':id')
+  async remove(@Param('id') id: ID) {
+    return await this.service.remove(id);
   }
 }
