@@ -28,7 +28,7 @@ export class AuthController {
 
   @Post('wallet_login')
   async loginByWallet(@Body() loginDto: LoginWalletDto) {
-    return await this.service.genTokenFromSign(loginDto.address, loginDto.sign);
+    return await this.service.genTokenFromSign(loginDto.address);
   }
 
   @UseGuards(JwtAuthGuard)
