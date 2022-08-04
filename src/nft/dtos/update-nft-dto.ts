@@ -31,6 +31,9 @@ export class UpdateNftDto extends BaseModel {
   owner: Ref<User>;
 
   @IsOptional()
+  mintCost: number;
+
+  @IsOptional()
   @IsNumber()
   level: number;
 

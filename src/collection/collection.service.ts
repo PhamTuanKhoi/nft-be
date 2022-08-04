@@ -49,6 +49,7 @@ export class CollectionService {
         },
       ];
     }
+
     let findQuery = this.model.aggregate(tmp);
     const count = (await findQuery.exec()).length;
     if (
@@ -73,7 +74,11 @@ export class CollectionService {
   };
 
   getById = async (id: ID): Promise<Collection> => {
-    return await this.model.findById(id).populate('nfts');
+    return await this.model.findById(id).populate('nfts').populate('creator');
+  };
+
+  getAll = async (): Promise<any> => {
+    return await this.model.find().populate('nfts').populate('creator');
   };
 
   create = async (collection: CreateCollectionDto): Promise<Collection> => {

@@ -34,6 +34,9 @@ export class CreateNftDto extends BaseModel {
   mint: boolean;
 
   @IsOptional()
+  mintCost: number;
+
+  @IsOptional()
   @IsNumber()
   endTime: number;
 }
