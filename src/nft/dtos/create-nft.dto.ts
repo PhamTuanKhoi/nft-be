@@ -1,33 +1,39 @@
-import { Ref } from "@typegoose/typegoose";
-import { IsNumber, IsOptional, IsString, Length } from "class-validator";
-import { ID } from "src/global/interfaces/id.interface";
-import { User } from "src/user/schemas/user.schema";
+import { Ref } from '@typegoose/typegoose';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Collection } from 'src/collection/schema/collection.schema';
+import { BaseModel } from 'src/global/base.model';
+import { User } from 'src/user/schemas/user.schema';
 
-export class CreateNftDto {
-    @IsString()
-    @Length(2, 50)
-    name: string;
+export class CreateNftDto extends BaseModel {
+  @IsString()
+  name: string;
 
-    @IsString()
-    media: string;
+  @IsString()
+  media: string;
 
-    @IsString()
-    fileType: string;
+  @IsEnum(['image', 'video', 'audio'])
+  fileType: string;
 
-    @IsOptional()
-    @IsString()
-    @Length(0, 200)
-    description: string;
+  @IsOptional()
+  description: string;
 
-    @IsString()
-    creator: Ref<User>;
+  @IsOptional()
+  creator: Ref<User>;
 
-    @IsString()
-    owner: Ref<User>;
+  @IsOptional()
+  collectionNft: Ref<Collection>;
 
-    @IsNumber()
-    level: number;
+  @IsOptional()
+  owner: Ref<User>;
 
-    @IsNumber()
-    endTime: number;
+  @IsOptional()
+  @IsNumber()
+  level: number;
+
+  @IsOptional()
+  mint: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  endTime: number;
 }

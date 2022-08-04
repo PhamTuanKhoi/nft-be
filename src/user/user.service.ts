@@ -18,138 +18,181 @@ import { UserRoleEnum } from './interfaces/userRole.enum';
 export class UserService {
   constructor(
     @InjectModel(User) private readonly model: ReturnModelType<typeof User>,
-  ) { }
+  ) {}
 
   async findAll(query: QueryUserDto): Promise<PaginateResponse<User>> {
-
-    const page = query.page ? query.page * 1 : 1
+    const page = query.page ? query.page * 1 : 1;
     const size = query.limit ? query.limit * 1 : 10;
-    const sortBy = query.sortBy
-    const sortType = query.sortType === -1 ? -1 : 1
-    console.log("Query", query)
+    const sortBy = query.sortBy;
+    const sortType = query.sortType === -1 ? -1 : 1;
+    console.log('Query', query);
     let tmp = [];
 
-    tmp = await [...tmp,
-    {
-      $match: {
-        password: null
-      }
-    }
-      ,
-    {
-      $lookup: {
-        from: "sales",
-        localField: '_id',
-        foreignField: 'seller',
-        as: "sale"
-      }
-    },
-    {
-      $lookup: {
-        from: "sales",
-        localField: '_id',
-        pipeline: [
-          {
-            $match: {
-              saleType: 0
-            }
-          }
-        ],
-        foreignField: 'seller',
-        as: "auction"
-      }
-    },
-    {
-      $lookup: {
-        from: "nfts",
-        localField: '_id',
-        foreignField: 'creator',
-        as: "nft"
-      }
-    },
-    {
-      $lookup: {
-        from: "collections",
-        localField: '_id',
-        foreignField: 'creator',
-        as: "collection"
-      }
-    },
-    {
-      $lookup: {
-        from: 'events',
-        let: { address: "$address" },
-        pipeline: [
-          {
-            $addFields: {
-              buyer: { $toUpper: "$args._buyer" }
-            }
-          },
-          {
-            $match:
+    tmp = await [
+      ...tmp,
+      {
+        $match: {
+          password: null,
+        },
+      },
+      {
+        $lookup: {
+          from: 'sales',
+          localField: '_id',
+          foreignField: 'seller',
+          as: 'sale',
+        },
+      },
+      {
+        $lookup: {
+          from: 'sales',
+          localField: '_id',
+          pipeline: [
             {
-              name: "Bought",
-              $expr: {
-                $and:
-                  [
-                    { $eq: ["$buyer", "$$address"] },
-                  ]
-              }
-            }
+              $match: {
+                saleType: 0,
+              },
+            },
+          ],
+          foreignField: 'seller',
+          as: 'auction',
+        },
+      },
+      {
+        $lookup: {
+          from: 'nfts',
+          localField: '_id',
+          foreignField: 'creator',
+          as: 'nft',
+        },
+      },
+      {
+        $lookup: {
+          from: 'collections',
+          localField: '_id',
+          foreignField: 'creator',
+          as: 'collection',
+        },
+      },
+      {
+        $lookup: {
+          from: 'events',
+          let: { address: '$address' },
+          pipeline: [
+            {
+              $addFields: {
+                buyer: { $toUpper: '$args._buyer' },
+              },
+            },
+            {
+              $match: {
+                name: 'Bought',
+                $expr: {
+                  $and: [{ $eq: ['$buyer', '$$address'] }],
+                },
+              },
+            },
+          ],
+          as: 'event',
+        },
+      },
+      {
+        $addFields: {
+          lengthEvent: {
+            $cond: {
+              if: { $isArray: '$event' },
+              then: { $size: '$event' },
+              else: 0,
+            },
           },
-        ],
-        as: 'event'
-      }
-    },
-    {
-      $addFields: {
-        lengthEvent: { $cond: { if: { $isArray: "$event" }, then: { $size: "$event" }, else: 0 } },
-        lengthSale: { $cond: { if: { $isArray: "$sale" }, then: { $size: "$sale" }, else: 0 } },
-        lengthNft: { $cond: { if: { $isArray: "$nft" }, then: { $size: "$nft" }, else: 0 } },
-        lengthAuction: { $cond: { if: { $isArray: "$auction" }, then: { $size: "$auction" }, else: 0 } },
-        lengthCollection: { $cond: { if: { $isArray: "$collection" }, then: { $size: "$collection" }, else: 0 } },
-        feature: { $ifNull: ['$feature', false] }
-      }
-    }
-    ]
+          lengthSale: {
+            $cond: {
+              if: { $isArray: '$sale' },
+              then: { $size: '$sale' },
+              else: 0,
+            },
+          },
+          lengthNft: {
+            $cond: {
+              if: { $isArray: '$nft' },
+              then: { $size: '$nft' },
+              else: 0,
+            },
+          },
+          lengthAuction: {
+            $cond: {
+              if: { $isArray: '$auction' },
+              then: { $size: '$auction' },
+              else: 0,
+            },
+          },
+          lengthCollection: {
+            $cond: {
+              if: { $isArray: '$collection' },
+              then: { $size: '$collection' },
+              else: 0,
+            },
+          },
+          feature: { $ifNull: ['$feature', false] },
+        },
+      },
+    ];
 
     if (query.feature) {
-      tmp = await [...tmp, {
-        $match: {
-          feature: true
-        }
-      }]
+      tmp = await [
+        ...tmp,
+        {
+          $match: {
+            feature: true,
+          },
+        },
+      ];
     }
 
     if (query.search) {
-      tmp = await [...tmp, {
-        $match: {
-          username: { $regex: '.*' + (query.search || "") + '.*', $options: 'i' }
-        }
-      }]
+      tmp = await [
+        ...tmp,
+        {
+          $match: {
+            username: {
+              $regex: '.*' + (query.search || '') + '.*',
+              $options: 'i',
+            },
+          },
+        },
+      ];
     }
 
     if (query.status) {
-      tmp = await [...tmp, {
-        $match: {
-          status: query.status
-        }
-      }]
+      tmp = await [
+        ...tmp,
+        {
+          $match: {
+            status: query.status,
+          },
+        },
+      ];
     }
 
-    tmp = await [...tmp, {
-      $sort: {
-        lengthEvent: -1,
-        lengthSale: -1,
-        lengthAuction: -1,
-        lengthNft: -1
-      }
-    }]
+    tmp = await [
+      ...tmp,
+      {
+        $sort: {
+          lengthEvent: -1,
+          lengthSale: -1,
+          lengthAuction: -1,
+          lengthNft: -1,
+        },
+      },
+    ];
 
     const findQuery = this.model.aggregate(tmp);
 
     const count = (await findQuery.exec()).length;
-    const result = await findQuery.skip((page - 1) * size).limit(size).exec();
+    const result = await findQuery
+      .skip((page - 1) * size)
+      .limit(size)
+      .exec();
 
     return {
       items: result,
@@ -211,10 +254,7 @@ export class UserService {
 
   async createOrUpdate(payload: UpdateUserDto) {
     if (!payload.address)
-      throw new HttpException(
-        'address is undefined',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException('address is undefined', HttpStatus.BAD_REQUEST);
     payload.address = payload.address.toUpperCase();
 
     const user = await this.model.findOne({
@@ -231,6 +271,7 @@ export class UserService {
 
   async findOrCreateByAddress(address: string) {
     let sender = await this.findByAddress(address);
+
     if (!sender) {
       sender = await this.createByAddress(address);
     }

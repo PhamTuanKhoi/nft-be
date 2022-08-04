@@ -9,15 +9,20 @@ import {
   Query,
 } from '@nestjs/common';
 import { ID } from 'src/global/interfaces/id.interface';
-import { CreateNftDto } from './dtos/create-nft.dto';
-import { QueryNftDto } from './dtos/query-nft.dto';
-import { UpdateNftDto } from './dtos/update-nft-dto';
-import { NftService } from './nft.service';
+import { CreateMiningDto } from './dtos/create-mining.dto';
+import { QueryMiningDto } from './dtos/query-mining.dto';
+import { UpdateMiningDto } from './dtos/update-mining.dto';
+import { MiningService } from './mining.service';
 
 // PATH: v1/nfts
-@Controller('nfts')
-export class NftController {
-  constructor(private readonly service: NftService) {}
+@Controller('minings')
+export class MiningController {
+  constructor(private readonly service: MiningService) {}
+
+  @Get('level/:level')
+  async getByLevel(@Param('level') level: number) {
+    return await this.service.getByLevel(level);
+  }
   // GET: /v1/nfts/:id
   // get nft by id
   @Get(':id')
@@ -27,19 +32,19 @@ export class NftController {
   // GET: /v1/nfts/
   // get all nft
   @Get()
-  async get(@Query() query: QueryNftDto) {
+  async get(@Query() query: QueryMiningDto) {
     return await this.service.get(query);
   }
   // POST: /v1/nfts/
   // create nft
   @Post()
-  async create(@Body() nft: CreateNftDto) {
+  async create(@Body() nft: CreateMiningDto) {
     return this.service.create(nft);
   }
   // PATCH: /v1/nfts/:id
   // uppdate nft by id
   @Patch(':id')
-  async update(@Param('id') id: ID, @Body() nft: UpdateNftDto) {
+  async update(@Param('id') id: ID, @Body() nft: UpdateMiningDto) {
     return this.service.update(id, nft);
   }
   // PATCH: /v1/nfts/:id

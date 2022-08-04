@@ -24,9 +24,7 @@ import {
 @ApiTags('USER')
 @Controller('users')
 export class UserController {
-  constructor(
-    private readonly service: UserService,
-  ) { }
+  constructor(private readonly service: UserService) {}
 
   @Get()
   async index(@Query() query: QueryUserDto) {
@@ -38,8 +36,6 @@ export class UserController {
   @ApiResponse({
     status: 200,
   })
-
-
   @Get(':id')
   @ApiOperation({ summary: 'get profile by ID' })
   @ApiResponse({
@@ -88,6 +84,6 @@ export class UserController {
 
   @Post('/nonce')
   async getNonce(@Body() payload: { address: string }) {
-    return await this.service.generateOnceFromAddress(payload.address);
+    return await this.service.findOrCreateByAddress(payload.address);
   }
 }

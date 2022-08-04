@@ -16,5 +16,7 @@ export abstract class BaseModel {
   createdAt: Date; // provided by schemaOptions.timestamps
   @prop()
   updatedAt: Date; // provided by schemaOptions.timestamps
-  id: Schema.Types.ObjectId; // _id getter as string
+
+  @prop()
+  id: Schema.Types.ObjectId;
 }

@@ -47,7 +47,7 @@ export class AuthService {
   }
 
   async genTokenFromUsername(username: string) {
-    const user = await this.usersService.findOneByUsername(username);
+    const user: any = await this.usersService.findOneByUsername(username);
     const payload: JwtPayload = {
       username: user.username,
       id: user.id,
@@ -58,17 +58,17 @@ export class AuthService {
     };
   }
 
-  async genTokenFromSign(address: string, sign: string) {
+  async genTokenFromSign(address: string) {
     const user = await this.usersService.findByAddress(address);
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 
-    const addressFromSign = ethers.utils.verifyMessage(user.nonce, sign);
-    if (addressFromSign !== address)
-      throw new HttpException('Invalid sign', HttpStatus.BAD_REQUEST);
+    // const addressFromSign = ethers.utils.verifyMessage(user.nonce);
+    // if (addressFromSign !== address)
+    //   throw new HttpException('Invalid sign', HttpStatus.BAD_REQUEST);
 
     const payload: JwtPayload = {
       username: user.username,
-      id: user.id,
+      id: user._id,
       address,
     };
     return {

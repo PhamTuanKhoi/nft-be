@@ -18,6 +18,9 @@ export class User extends BaseModel {
   @prop()
   title: string;
 
+  @prop({ default: 'Unnamed' })
+  displayName: string;
+
   @prop()
   status: UserStatusEnum;
 
@@ -52,7 +55,7 @@ export class User extends BaseModel {
   nonce: string;
 
   @prop({ default: false })
-  verified: false
+  verified: false;
 
   @prop({ default: false })
   feature: boolean;

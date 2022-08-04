@@ -28,7 +28,7 @@ export class AuthController {
 
   @Post('wallet_login')
   async loginByWallet(@Body() loginDto: LoginWalletDto) {
-    return await this.service.genTokenFromSign(loginDto.address, loginDto.sign);
+    return await this.service.genTokenFromSign(loginDto.address);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -39,6 +39,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('profile')
+<<<<<<< HEAD
   async updateProfile(
     @Auth() auth: JwtPayload,
     @Body() profile: UpdateUserDto,
@@ -46,6 +47,8 @@ export class AuthController {
     return await this.service.updateProfile(auth.id, profile);
   }
 
+=======
+>>>>>>> triet
   @Post('reset_request')
   async requestReset(@Body() payload: ResetRequestDto) {
     await this.service.resetRequest(payload.email);

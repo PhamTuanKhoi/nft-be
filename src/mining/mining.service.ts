@@ -3,21 +3,18 @@ import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { ID } from 'src/global/interfaces/id.interface';
 import { PaginateResponse } from 'src/global/interfaces/paginate.interface';
-import { CreateCollectionDto } from './dtos/create-collection.dto';
-import { QueryCollectionDto } from './dtos/query-collection.dto';
-import { UpdateCollectionDto } from './dtos/update-collection.dto';
-import { Collection } from './schema/collection.schema';
+import { CreateMiningDto } from './dtos/create-mining.dto';
+import { QueryMiningDto } from './dtos/query-mining.dto';
+import { UpdateMiningDto } from './dtos/update-mining.dto';
+import { Mining } from './schema/mining.schema';
 
 @Injectable()
-export class CollectionService {
+export class MiningService {
   constructor(
-    @InjectModel(Collection)
-    private readonly model: ReturnModelType<typeof Collection>,
+    @InjectModel(Mining) private readonly model: ReturnModelType<typeof Mining>,
   ) {}
 
-  get = async (
-    query: QueryCollectionDto,
-  ): Promise<PaginateResponse<Collection>> => {
+  get = async (query: QueryMiningDto): Promise<PaginateResponse<Mining>> => {
     let tmp = [];
     if (query.search !== undefined && query.search.length > 0) {
       tmp = [
@@ -60,22 +57,23 @@ export class CollectionService {
     };
   };
 
-  getById = async (id: ID): Promise<Collection> => {
-    return await this.model.findById(id).populate('nfts');
+  getById = async (id: ID): Promise<Mining> => {
+    return this.model.findById(id);
   };
 
-  create = async (collection: CreateCollectionDto): Promise<Collection> => {
-    return await this.model.create(collection);
+  getByLevel = async (level: number): Promise<Mining> => {
+    return this.model.findOne({ level: level });
   };
 
-  update = async (
-    id: ID,
-    collection: UpdateCollectionDto,
-  ): Promise<Collection> => {
-    return await this.model.findByIdAndUpdate(id, collection, { new: true });
+  create = async (nft: CreateMiningDto): Promise<Mining> => {
+    return await this.model.create(nft);
   };
 
-  async remove(id: ID): Promise<Collection> {
-    return this.model.findByIdAndRemove(id);
-  }
+  update = async (id: ID, nft: UpdateMiningDto): Promise<Mining> => {
+    return await this.model.findByIdAndUpdate(id, nft, { new: true });
+  };
+
+  delete = async (id: ID): Promise<Mining> => {
+    return await this.model.findByIdAndDelete(id);
+  };
 }
