@@ -39,7 +39,6 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('profile')
-<<<<<<< HEAD
   async updateProfile(
     @Auth() auth: JwtPayload,
     @Body() profile: UpdateUserDto,
@@ -47,8 +46,6 @@ export class AuthController {
     return await this.service.updateProfile(auth.id, profile);
   }
 
-=======
->>>>>>> triet
   @Post('reset_request')
   async requestReset(@Body() payload: ResetRequestDto) {
     await this.service.resetRequest(payload.email);
