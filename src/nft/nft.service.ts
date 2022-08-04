@@ -36,24 +36,27 @@ export class NftService {
         },
       ];
     }
-    if (query.endTime) {
+    if (query.sortBy !== undefined && query.sortBy.length > 0) {
       tmp = [
         ...tmp,
         {
-          $match: {
-            endTime: { $gt: new Date().getTime() },
+          $sort: {
+            [query.sortBy]: query.sortType,
+          },
+        },
+      ];
+    } else {
+      tmp = [
+        ...tmp,
+        {
+          $sort: {
+            name: 1,
           },
         },
       ];
     }
-    tmp = [
-      ...tmp,
-      {
-        $sort: {
-          [query.sortBy]: query.sortType,
-        },
-      },
-    ];
+
+    console.log(tmp);
     let findQuery = this.model.aggregate(tmp);
     const count = (await findQuery.exec()).length;
     if (

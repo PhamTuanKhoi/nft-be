@@ -1,9 +1,8 @@
 import { prop, Ref } from '@typegoose/typegoose';
 import { Collection } from 'src/collection/schema/collection.schema';
-import { BaseModel } from 'src/global/base.model';
 import { User } from 'src/user/schemas/user.schema';
 
-export class NFT extends BaseModel {
+export class NFT {
   @prop({ required: true })
   name: string;
 
