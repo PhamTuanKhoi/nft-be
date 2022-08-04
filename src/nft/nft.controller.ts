@@ -24,12 +24,21 @@ export class NftController {
   async getById(@Param('id') id: ID) {
     return await this.service.getById(id);
   }
+
+  // GET: /v1/nfts/all
+  // get all nft no query
+  @Get('/all/nfts')
+  async getAll() {
+    return await this.service.getAll();
+  }
+
   // GET: /v1/nfts/
-  // get all nft
+  // get all nft with query
   @Get()
   async get(@Query() query: QueryNftDto) {
     return await this.service.get(query);
   }
+
   // POST: /v1/nfts/
   // create nft
   @Post()

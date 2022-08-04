@@ -10,7 +10,9 @@ import { Auth } from './decorator/auth.decorator';
 import { ResetPasswordDto } from '../user/dtos/reset-password.dto';
 import { UpdateUserDto } from 'src/user/dtos/update-user.dto';
 import { LoginWalletDto } from 'src/user/dtos/login-wallet.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('AUTH')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly service: AuthService) {}

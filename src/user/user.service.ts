@@ -25,7 +25,6 @@ export class UserService {
     const size = query.limit ? query.limit * 1 : 10;
     const sortBy = query.sortBy;
     const sortType = query.sortType === -1 ? -1 : 1;
-    console.log('Query', query);
     let tmp = [];
 
     tmp = await [

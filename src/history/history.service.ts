@@ -1,20 +1,21 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { prop, ReturnModelType } from '@typegoose/typegoose';
+import { Injectable } from '@nestjs/common';
+import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { ID } from 'src/global/interfaces/id.interface';
 import { PaginateResponse } from 'src/global/interfaces/paginate.interface';
-import { CreateNftDto } from './dtos/create-nft.dto';
-import { QueryNftDto } from './dtos/query-nft.dto';
-import { UpdateNftDto } from './dtos/update-nft-dto';
-import { NFT } from './schema/nft.schema';
+import { CreateHistoryDto } from './dtos/create-history.dto';
+import { QueryHistoryDto } from './dtos/query-history.dto';
+import { UpdateHistoryDto } from './dtos/update-history.dto';
+import { History } from './schema/history.schema';
 
 @Injectable()
-export class NftService {
+export class HistoryService {
   constructor(
-    @InjectModel(NFT) private readonly model: ReturnModelType<typeof NFT>,
+    @InjectModel(History)
+    private readonly model: ReturnModelType<typeof History>,
   ) {}
 
-  get = async (query: QueryNftDto): Promise<PaginateResponse<NFT>> => {
+  get = async (query: QueryHistoryDto): Promise<PaginateResponse<History>> => {
     let tmp = [];
     if (query.search !== undefined && query.search.length > 0) {
       tmp = [
@@ -22,16 +23,6 @@ export class NftService {
         {
           $match: {
             name: { $regex: '.*' + query.search + '.*', $options: 'i' },
-          },
-        },
-      ];
-    }
-    if (query.fileType !== undefined && query.fileType.length > 0) {
-      tmp = [
-        ...tmp,
-        {
-          $match: {
-            fileType: query.fileType,
           },
         },
       ];
@@ -50,12 +41,11 @@ export class NftService {
         ...tmp,
         {
           $sort: {
-            createdAt: 1,
+            currentLevel: -1,
           },
         },
       ];
     }
-
     let findQuery = this.model.aggregate(tmp);
     const count = (await findQuery.exec()).length;
     if (
@@ -65,7 +55,7 @@ export class NftService {
       query.page > 0
     ) {
       findQuery = findQuery
-        .limit(query.limit * query.page)
+        .limit(query.limit)
         .skip((query.page - 1) * query.limit);
     }
     const result = await findQuery.exec();
@@ -80,41 +70,25 @@ export class NftService {
   };
 
   getAll = async (): Promise<any> => {
-    return this.model
-      .find()
-      .populate('creator')
-      .populate('owner')
-      .populate('collectionNft');
+    return this.model.find().populate('user').populate('nft');
   };
 
-  getById = async (id: ID): Promise<NFT> => {
-    return this.model
-      .findById(id)
-      .populate('creator')
-      .populate('owner')
-      .populate('collectionNft');
+  getById = async (id: ID): Promise<History> => {
+    return this.model.findById(id).populate('user').populate('nft');
   };
 
-  create = async (nft: CreateNftDto): Promise<NFT> => {
+  create = async (nft: CreateHistoryDto): Promise<History> => {
     return await this.model.create(nft);
   };
 
-  update = async (id: ID, nft: UpdateNftDto): Promise<NFT> => {
+  update = async (id: ID, nft: UpdateHistoryDto): Promise<History> => {
     return await this.model
       .findByIdAndUpdate(id, nft, { new: true })
-      .populate('creator')
-      .populate('owner')
-      .populate('collectionNft');
+      .populate('user')
+      .populate('nft');
   };
 
-  delete = async (id: ID): Promise<NFT> => {
-    const idNft = await this.model.findById(id);
-    if (idNft.level > 1) {
-      throw new HttpException(
-        "Can't not delete NFT great than 1",
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+  delete = async (id: ID): Promise<History> => {
     return await this.model.findByIdAndDelete(id);
   };
 }

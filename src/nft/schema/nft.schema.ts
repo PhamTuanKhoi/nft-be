@@ -1,7 +1,6 @@
-import { prop, Ref } from '@typegoose/typegoose';
+import { pre, prop, Ref } from '@typegoose/typegoose';
 import { Collection } from 'src/collection/schema/collection.schema';
 import { User } from 'src/user/schemas/user.schema';
-
 export class NFT {
   @prop({ required: true })
   name: string;
@@ -26,6 +25,9 @@ export class NFT {
 
   @prop({ default: 1 })
   level: number;
+
+  @prop({ default: 0 })
+  mintCost: number;
 
   @prop({ default: false })
   mint: boolean;

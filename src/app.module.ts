@@ -1,26 +1,28 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { NftModule } from './nft/nft.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { TypegooseModule } from 'nestjs-typegoose';
-import { UploadModule } from './upload/upload.module';
+import { AppController } from './app.controller';
 import { ScheduleModule } from '@nestjs/schedule';
-import { NftModule } from './nft/nft.module';
-import { CollectionModule } from './collection/collection.module';
+import { TypegooseModule } from 'nestjs-typegoose';
 import { MiningModule } from './mining/mining.module';
+import { UploadModule } from './upload/upload.module';
+import { HistoryModule } from './history/history.module';
+import { CollectionModule } from './collection/collection.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     TypegooseModule.forRoot(process.env.MONGO),
     ScheduleModule.forRoot(),
+    NftModule,
     UserModule,
     AuthModule,
-    UploadModule,
-    NftModule,
-    CollectionModule,
     MiningModule,
+    UploadModule,
+    HistoryModule,
+    CollectionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
