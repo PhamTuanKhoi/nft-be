@@ -29,14 +29,26 @@ export class CollectionService {
         },
       ];
     }
-    tmp = [
-      ...tmp,
-      {
-        $sort: {
-          [query.sortBy]: query.sortType,
+
+    if (query.sortBy !== undefined && query.sortBy.length > 0) {
+      tmp = [
+        ...tmp,
+        {
+          $sort: {
+            [query.sortBy]: query.sortType,
+          },
         },
-      },
-    ];
+      ];
+    } else {
+      tmp = [
+        ...tmp,
+        {
+          $sort: {
+            createdAt: -1,
+          },
+        },
+      ];
+    }
     let findQuery = this.model.aggregate(tmp);
     const count = (await findQuery.exec()).length;
     if (
