@@ -121,14 +121,8 @@ export class UserService {
   }
 
   async update(id, user) {
-<<<<<<< HEAD
     return this.model.findByIdAndUpdate(id, user, { new: true })
   }
-=======
-    return this.model.findByIdAndUpdate(id, user, { new: true });
-  }
-
->>>>>>> origin/develop
   // async generateOnceFromAddress(address: string) {
   //   const user = await this.findByAddress(address);
   //   if (user) {

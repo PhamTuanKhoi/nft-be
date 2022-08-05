@@ -59,7 +59,6 @@ export class UserController {
     return await this.service.remove(id);
   }
 
-<<<<<<< HEAD
   // @Patch(':a/follow/:b')
   // async follow(@Param('a', ParseIdPipe) a: ID, @Param('b', ParseIdPipe) b: ID) {
   //   return await this.service.follow(a, b);
@@ -78,8 +77,6 @@ export class UserController {
   //   return await this.service.createOrUpdate(payload);
   // }
 
-=======
->>>>>>> origin/develop
   @Get('/address/:address')
   async findByAddress(@Param('address') address: string) {
     return await this.service.findByAddress(address);

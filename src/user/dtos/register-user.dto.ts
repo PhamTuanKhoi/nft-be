@@ -1,18 +1,7 @@
 import { Type } from 'class-transformer';
 import { UserRoleEnum } from '../interfaces/userRole.enum';
 import { UserStatusEnum } from '../interfaces/userStatus.enum';
-<<<<<<< HEAD
 import { IsBoolean, IsEnum, IsOptional, Length, IsString, IsEmail} from 'class-validator';
-=======
-import {
-  IsBoolean,
-  IsEmail,
-  IsEnum,
-  IsOptional,
-  IsString,
-  Length,
-} from 'class-validator';
->>>>>>> origin/develop
 
 export class RegisterUserDto {
   @IsOptional()
