@@ -18,7 +18,7 @@ import { UserRoleEnum } from './interfaces/userRole.enum';
 export class UserService {
   constructor(
     @InjectModel(User) private readonly model: ReturnModelType<typeof User>,
-  ) {}
+  ) { }
 
   async findAll(query: QueryUserDto): Promise<PaginateResponse<User>> {
     let tmp = [];
@@ -120,6 +120,9 @@ export class UserService {
     });
   }
 
+  async update(id, user) {
+    return this.model.findByIdAndUpdate(id, user, { new: true })
+  }
   // async generateOnceFromAddress(address: string) {
   //   const user = await this.findByAddress(address);
   //   if (user) {

@@ -59,23 +59,23 @@ export class UserController {
     return await this.service.remove(id);
   }
 
-  @Patch(':a/follow/:b')
-  async follow(@Param('a', ParseIdPipe) a: ID, @Param('b', ParseIdPipe) b: ID) {
-    return await this.service.follow(a, b);
-  }
+  // @Patch(':a/follow/:b')
+  // async follow(@Param('a', ParseIdPipe) a: ID, @Param('b', ParseIdPipe) b: ID) {
+  //   return await this.service.follow(a, b);
+  // }
 
-  @Patch(':a/unfollow/:b')
-  async unFollow(
-    @Param('a', ParseIdPipe) a: ID,
-    @Param('b', ParseIdPipe) b: ID,
-  ) {
-    return await this.service.unFollow(a, b);
-  }
+  // @Patch(':a/unfollow/:b')
+  // async unFollow(
+  //   @Param('a', ParseIdPipe) a: ID,
+  //   @Param('b', ParseIdPipe) b: ID,
+  // ) {
+  //   return await this.service.unFollow(a, b);
+  // }
 
-  @Patch()
-  async createOrUpdate(@Body() payload: UpdateUserDto) {
-    return await this.service.createOrUpdate(payload);
-  }
+  // @Patch()
+  // async createOrUpdate(@Body() payload: UpdateUserDto) {
+  //   return await this.service.createOrUpdate(payload);
+  // }
 
   @Get('/address/:address')
   async findByAddress(@Param('address') address: string) {
