@@ -1,3 +1,4 @@
+import { Category } from './../../category/schema/category.schema';
 import { Ref } from '@typegoose/typegoose';
 import { IsOptional } from 'class-validator';
 import { BaseModel } from 'src/global/base.model';
@@ -16,6 +17,9 @@ export class CreateCollectionDto extends BaseModel {
 
   @IsOptional()
   creator: Ref<User>;
+
+  @IsOptional()
+  category: Ref<Category>;
 
   @IsOptional()
   nfts: Ref<NFT>[];

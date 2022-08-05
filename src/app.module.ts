@@ -10,6 +10,7 @@ import { TypegooseModule } from 'nestjs-typegoose';
 import { MiningModule } from './mining/mining.module';
 import { UploadModule } from './upload/upload.module';
 import { HistoryModule } from './history/history.module';
+import { CategoryModule } from './category/category.module';
 import { CollectionModule } from './collection/collection.module';
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CollectionModule } from './collection/collection.module';
     MiningModule,
     UploadModule,
     HistoryModule,
+    CategoryModule,
     CollectionModule,
   ],
   controllers: [AppController],
