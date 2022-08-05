@@ -6,6 +6,12 @@ import { UserStatusEnum } from '../interfaces/userStatus.enum';
 
 export class User extends BaseModel {
   @prop()
+  cover: string;
+
+  @prop()
+  avatar: string;
+
+  @prop()
   username: string;
 
   @prop()
@@ -22,37 +28,31 @@ export class User extends BaseModel {
   displayName: string;
 
   @prop()
-  status: UserStatusEnum;
+  nonce: string;
 
-  @prop()
+  @prop({ required: true })
   address: string;
-
-  @prop()
-  avatar: string;
-
-  @prop()
-  cover: string;
 
   @prop()
   bio: string;
 
   @prop()
-  links: unknown;
+  customUrl: string;
 
-  @prop({ default: UserRoleEnum.USER })
-  role: UserRoleEnum;
+  @prop()
+  facebook: string;
 
-  @prop({ default: true })
-  isCreator: boolean;
+  @prop()
+  twitter: string;
+
+  @prop()
+  discord: string;
 
   @prop({ ref: () => User })
   followeds: Ref<User>[];
 
   @prop({ ref: () => User })
   followers: Ref<User>[];
-
-  @prop({ type: String })
-  nonce: string;
 
   @prop({ default: false })
   verified: false;
