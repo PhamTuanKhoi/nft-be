@@ -120,6 +120,10 @@ export class UserService {
     });
   }
 
+  async update(id, user) {
+    return this.model.findByIdAndUpdate(id, user, { new: true });
+  }
+
   // async generateOnceFromAddress(address: string) {
   //   const user = await this.findByAddress(address);
   //   if (user) {
