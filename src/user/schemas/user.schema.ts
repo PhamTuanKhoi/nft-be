@@ -4,6 +4,12 @@ import { BaseModel } from '../../global/base.model';
 
 export class User extends BaseModel {
   @prop()
+  cover: string;
+  
+  @prop()
+  avatar: string;
+
+  @prop()
   username: string;
 
   @prop()
@@ -19,6 +25,21 @@ export class User extends BaseModel {
   @prop()
   nonce: string;
 
-  @prop()
+  @prop({ required: true })
   address: string;
+
+  @prop()
+  bio: string;
+
+  @prop()
+  customUrl: string;
+
+  @prop()
+  facebook: string;
+
+  @prop()
+  twitter: string;
+
+  @prop()
+  discord: string;
 }

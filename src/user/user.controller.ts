@@ -20,6 +20,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { User } from './schemas/user.schema';
 
 @ApiBearerAuth()
 @ApiTags('USER')
@@ -67,5 +68,10 @@ export class UserController {
   @Post('/nonce')
   async getNonce(@Body() payload: { address: string }) {
     return await this.service.findOrCreateByAddress(payload.address);
+  }
+
+  @Patch(":id")
+  async update(@Param("id") id:ID, @Body() user){
+    return await this.service.update(id, user);
   }
 }
