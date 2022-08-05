@@ -4,43 +4,59 @@ import { UserStatusEnum } from '../interfaces/userStatus.enum';
 import { IsBoolean, IsEnum, IsOptional, Length } from 'class-validator';
 
 export class RegisterUserDto {
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  cover: string;
+
+
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  avatar: string;
+
+  @IsEmail()
+  @Type(() => String)
+  email: string;
+
+  @IsString()
+  @Type(() => String)
   @Length(2, 100)
   username: string;
 
+  @IsString()
+  @Type(() => String)
   @Length(4, 30)
   password: string;
 
   @IsOptional()
-  @Length(4, 30)
-  title: string;
+  @IsString()
+  @Type(() => String)
+  @Length(2, 30)
+  displayName: string;
 
   @IsOptional()
-  @IsEnum(UserStatusEnum)
-  status: UserStatusEnum = UserStatusEnum.ACTIVE;
-
-  @IsOptional()
-  avatar: string;
-
-  @IsOptional()
-  cover: string;
-
-  @IsOptional()
-  address: string;
-
-  @IsOptional()
+  @IsString()
+  @Type(() => String)
   bio: string;
 
   @IsOptional()
-  links: unknown;
+  @IsString()
+  @Type(() => String)
+  customUrl: string;
 
-  @IsEnum(UserRoleEnum)
-  role = UserRoleEnum.USER;
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  facebook: string;
 
-  @IsBoolean()
-  @Type(() => Boolean)
-  isCreator = false;
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  twitter: string;
 
-  @IsBoolean()
-  @Type(() => Boolean)
-  feature = false;
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  discord: string;
 }
