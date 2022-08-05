@@ -38,14 +38,14 @@ export class HistoryController {
   // POST: /v1/histories/
   // create histories
   @Post()
-  async create(@Body() nft: CreateHistoryDto) {
-    return this.service.create(nft);
+  async create(@Body() history: CreateHistoryDto) {
+    return this.service.create(history);
   }
   // PATCH: /v1/histories/:id
   // update histories by id
   @Patch(':id')
-  async update(@Param('id') id: ID, @Body() nft: UpdateHistoryDto) {
-    return this.service.update(id, nft);
+  async update(@Param('id') id: ID, @Body() history: UpdateHistoryDto) {
+    return this.service.update(id, history);
   }
   // PATCH: /v1/histories/:id
   // update histories by id
