@@ -12,13 +12,13 @@ import { UploadModule } from './upload/upload.module';
 import { HistoryModule } from './history/history.module';
 import { CategoryModule } from './category/category.module';
 import { CollectionModule } from './collection/collection.module';
-import { ProblemCategoryModule } from './problemCategory/problemCategory.module';
+import { ProblemModule } from './problem/problem.module';
+import { ProblemCategoryModule } from './problem-category/problem-category.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     TypegooseModule.forRoot(process.env.MONGO),
     ScheduleModule.forRoot(),
-    ProblemCategoryModule,
     NftModule,
     UserModule,
     AuthModule,
@@ -27,6 +27,8 @@ import { ProblemCategoryModule } from './problemCategory/problemCategory.module'
     HistoryModule,
     CategoryModule,
     CollectionModule,
+    ProblemModule,
+    ProblemCategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
