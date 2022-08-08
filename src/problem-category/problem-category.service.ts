@@ -12,7 +12,7 @@ export class ProblemCategoryService {
     @InjectModel(ProblemCategory)
     private readonly model: ReturnModelType<typeof ProblemCategory>,
   ){}
-  async create(createProblemCategoryDto: CreateProblemCategoryDto) {
+  async create(createProblemCategoryDto: CreateProblemCategoryDto): Promise<ProblemCategory> {
     try {
       const createdProblemCategory =  await this.model.create(createProblemCategoryDto)
       this.logger.log(`created a new ProblemCategory by id#${createdProblemCategory?._id}`)
@@ -31,18 +31,42 @@ export class ProblemCategoryService {
   }
 
   findAll() {
-    return `This action returns all problemCategory`;
+    try {
+      return this.model.find();
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);   
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} problemCategory`;
+  findOne(id: string) {
+    try {
+      return this.model.findById(id);
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);   
+    }
   }
 
-  update(id: number, updateProblemCategoryDto: UpdateProblemCategoryDto) {
-    return `This action updates a #${id} problemCategory`;
+  async update(id: string, updateProblemCategoryDto: UpdateProblemCategoryDto): Promise<ProblemCategory> {
+    try {
+      const updated = await this.model.findByIdAndUpdate(id, updateProblemCategoryDto, {new: true})
+      this.logger.log(`updated problemCategory by id#${updated._id}`)
+      return updated;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);   
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} problemCategory`;
+  async remove(id: string): Promise<ProblemCategory> {
+    try {
+      const removed = await this.model.findByIdAndDelete(id)
+      this.logger.log(`removed problemCategory by id#${removed._id}`)
+      return removed;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);   
+    }
   }
 }
