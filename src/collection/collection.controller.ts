@@ -21,12 +21,6 @@ import { Collection } from './schema/collection.schema';
 export class CollectionController {
   constructor(private readonly service: CollectionService) {}
 
-  //GET v1/collections/:id
-  @Get(':id')
-  async getById(@Param('id') id: ID): Promise<Collection> {
-    return this.service.getById(id);
-  }
-
   // GET v1/collections/
   @Get()
   async get(
@@ -40,7 +34,11 @@ export class CollectionController {
   async getAll() {
     return this.service.getAll();
   }
-
+  //GET v1/collections/:id
+  @Get(':id')
+  async getById(@Param('id') id: ID): Promise<Collection> {
+    return this.service.getById(id);
+  }
   // POST v1/collections
   @Post()
   async create(@Body() collection: CreateCollectionDto): Promise<Collection> {
