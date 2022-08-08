@@ -1,11 +1,24 @@
 import { Injectable } from '@nestjs/common';
+import { ReturnModelType } from '@typegoose/typegoose';
+import { InjectModel } from 'nestjs-typegoose';
 import { CreateProblemCategoryDto } from './dto/create-problem-category.dto';
 import { UpdateProblemCategoryDto } from './dto/update-problem-category.dto';
+import { ProblemCategory } from './schema/problem-category.schema';
 
 @Injectable()
 export class ProblemCategoryService {
-  create(createProblemCategoryDto: CreateProblemCategoryDto) {
-    return 'This action adds a new problemCategory';
+
+  constructor(
+    @InjectModel(ProblemCategory)
+    private readonly model: ReturnModelType<typeof ProblemCategory>,
+  ){}
+  async create(createProblemCategoryDto: CreateProblemCategoryDto) {
+    try {
+      const createdProblemCategory =  await this.model.create(createProblemCategoryDto)
+      return createdProblemCategory;
+    } catch (error) {
+      console.log(error)    
+    }
   }
 
   findAll() {
