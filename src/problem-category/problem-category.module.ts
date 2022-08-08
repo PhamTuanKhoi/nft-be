@@ -5,8 +5,9 @@ import { TypegooseModule } from 'nestjs-typegoose';
 import { ProblemCategory } from './schema/problem-category.schema';
 
 @Module({
-  imports: [TypegooseModule.forFeature([ProblemCategory]), ProblemCategory],
+  imports: [TypegooseModule.forFeature([ProblemCategory])],
   controllers: [ProblemCategoryController],
-  providers: [ProblemCategoryService]
+  providers: [ProblemCategoryService],
+  exports: [ProblemCategoryService]
 })
 export class ProblemCategoryModule {}
