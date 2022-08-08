@@ -3,7 +3,7 @@ import { ProblemCategoryService } from './problem-category.service';
 import { CreateProblemCategoryDto } from './dto/create-problem-category.dto';
 import { UpdateProblemCategoryDto } from './dto/update-problem-category.dto';
 
-@Controller('problem-category')
+@Controller('problem-categorys')
 export class ProblemCategoryController {
   constructor(private readonly problemCategoryService: ProblemCategoryService) {}
 
