@@ -18,12 +18,6 @@ import { NftService } from './nft.service';
 @Controller('nfts')
 export class NftController {
   constructor(private readonly service: NftService) {}
-  // GET: /v1/nfts/:id
-  // get nft by id
-  @Get(':id')
-  async getById(@Param('id') id: ID) {
-    return await this.service.getById(id);
-  }
 
   // GET: /v1/nfts/all
   // get all nft no query
@@ -39,6 +33,12 @@ export class NftController {
     return await this.service.get(query);
   }
 
+    // GET: /v1/nfts/:id
+  // get nft by id
+  @Get(':id')
+  async getById(@Param('id') id: ID) {
+    return await this.service.getById(id);
+  }
   // POST: /v1/nfts/
   // create nft
   @Post()

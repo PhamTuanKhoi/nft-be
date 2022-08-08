@@ -11,21 +11,21 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { ID } from 'src/global/interfaces/id.interface';
 import { PaginateResponse } from 'src/global/interfaces/paginate.interface';
-import { CollectionService } from './collection.service';
-import { CreateCollectionDto } from './dtos/create-collection.dto';
+import { CreateProblemCategoryDto } from './dtos/create-problemCategory.dto';
 import { QueryCollectionDto } from './dtos/query-collection.dto';
-import { UpdateCollectionDto } from './dtos/update-collection.dto';
-import { Collection } from './schema/collection.schema';
+import { UpdateProblemCategoryDto } from './dtos/update-collection.dto';
+import { ProblemCategoryService } from './ProblemCategory.service';
+import { ProblemCategory } from './schema/problemCategory.schema';
 @ApiTags('COLLECTION')
 @Controller('collections')
-export class CollectionController {
-  constructor(private readonly service: CollectionService) {}
+export class ProblemCategoryController {
+  constructor(private readonly service: ProblemCategoryService) {}
 
   // GET v1/collections/
   @Get()
   async get(
     @Query() query: QueryCollectionDto,
-  ): Promise<PaginateResponse<Collection>> {
+  ): Promise<PaginateResponse<ProblemCategory>> {
     return this.service.get(query);
   }
 
@@ -36,18 +36,18 @@ export class CollectionController {
   }
   //GET v1/collections/:id
   @Get(':id')
-  async getById(@Param('id') id: ID): Promise<Collection> {
+  async getById(@Param('id') id: ID): Promise<ProblemCategory> {
     return this.service.getById(id);
   }
   // POST v1/collections
   @Post()
-  async create(@Body() collection: CreateCollectionDto): Promise<Collection> {
+  async create(@Body() collection: CreateProblemCategoryDto): Promise<ProblemCategory> {
     return this.service.create(collection);
   }
 
   // PATCH /v1/collections/:id
   @Patch(':id')
-  async update(@Param('id') id: ID, @Body() collection: UpdateCollectionDto) {
+  async update(@Param('id') id: ID, @Body() collection: UpdateProblemCategoryDto) {
     return this.service.update(id, collection);
   }
 
