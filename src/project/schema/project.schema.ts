@@ -11,6 +11,9 @@ export class Project {
     @prop()
     name: string;
 
+    @prop()
+    image: string;
+
     @prop({ ref: () => ProblemCategory, required: true })
     problemCategory: Ref<ProblemCategory>;
 

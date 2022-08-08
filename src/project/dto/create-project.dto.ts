@@ -6,6 +6,10 @@ export class CreateProjectDto {
     @IsString()
     name: string;
 
+    @IsOptional()
+    @IsString()
+    image: string;
+
     @IsNotEmpty()
     @IsString()
     problemCategory: string;

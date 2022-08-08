@@ -14,6 +14,7 @@ import { CategoryModule } from './category/category.module';
 import { CollectionModule } from './collection/collection.module';
 import { ProblemCategoryModule } from './problem-category/problem-category.module';
 import { ProjectModule } from './project/project.module';
+import { BadgesModule } from './badges/badges.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -29,6 +30,7 @@ import { ProjectModule } from './project/project.module';
     CollectionModule,
     ProblemCategoryModule,
     ProjectModule,
+    BadgesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
