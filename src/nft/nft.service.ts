@@ -15,7 +15,16 @@ export class NftService {
   ) {}
 
   get = async (query: QueryNftDto): Promise<PaginateResponse<NFT>> => {
-    let tmp = [];
+    let tmp: any = [
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'creator',
+          foreignField: '_id',
+          as: 'creator',
+        },
+      },
+    ];
     if (query.search !== undefined && query.search.length > 0) {
       tmp = [
         ...tmp,
@@ -65,7 +74,7 @@ export class NftService {
       query.page > 0
     ) {
       findQuery = findQuery
-        .limit(query.limit * query.page)
+        .limit(query.limit * query.page || 1)
         .skip((query.page - 1) * query.limit);
     }
     const result = await findQuery.exec();
