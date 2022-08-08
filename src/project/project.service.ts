@@ -38,7 +38,7 @@ export class ProjectService {
 
   findOne(id: string) {
     try {
-      return this.model.findById(id);
+      return this.model.findById(id).populate('problemCategory');
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);   
