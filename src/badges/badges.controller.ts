@@ -19,16 +19,16 @@ export class BadgesController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.badgesService.findOne(+id);
+    return this.badgesService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateBadgeDto: UpdateBadgeDto) {
-    return this.badgesService.update(+id, updateBadgeDto);
+    return this.badgesService.update(id, updateBadgeDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.badgesService.remove(+id);
+    return this.badgesService.remove(id);
   }
 }
