@@ -12,7 +12,6 @@ import { UploadModule } from './upload/upload.module';
 import { HistoryModule } from './history/history.module';
 import { CategoryModule } from './category/category.module';
 import { CollectionModule } from './collection/collection.module';
-import { ProblemModule } from './problem/problem.module';
 import { ProblemCategoryModule } from './problem-category/problem-category.module';
 import { ProjectModule } from './project/project.module';
 @Module({
@@ -28,7 +27,6 @@ import { ProjectModule } from './project/project.module';
     HistoryModule,
     CategoryModule,
     CollectionModule,
-    ProblemModule,
     ProblemCategoryModule,
     ProjectModule,
   ],

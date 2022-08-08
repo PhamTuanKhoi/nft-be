@@ -1,12 +1,13 @@
 import { prop, Ref } from "@typegoose/typegoose";
 import { ProblemCategory } from "src/problem-category/schema/problem-category.schema";
 import { User } from "src/user/schemas/user.schema";
-export enum ProblemStatusEnum{
+
+export enum ProjectStatusEnum{
     Mining = 0,
     Mined = 1,
     Waiting = 2
 }
-export class Problem {
+export class Project {
     @prop()
     name: string;
 
@@ -22,8 +23,8 @@ export class Problem {
     @prop()
     description: string;
 
-    @prop({default: ProblemStatusEnum.Mining})
-    status: ProblemStatusEnum;
+    @prop({default: ProjectStatusEnum.Mining})
+    status: ProjectStatusEnum;
 
     @prop()
     address: string;
