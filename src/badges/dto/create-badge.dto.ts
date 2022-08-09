@@ -14,6 +14,6 @@ export class CreateBadgeDto {
     description: string;
 
     @IsNotEmpty()
-    @IsString()
+    // @IsString()
     owner: string;
 }
