@@ -35,7 +35,6 @@ export class ProjectService {
       sortBy,
       ...filterQuery
     } = query;
-    let skip = (+page - 1) * +limit;
 
     let pipeline: any = [
       {
@@ -65,14 +64,16 @@ export class ProjectService {
         },
       });
     }
-    const [data, count] = await Promise.all([
-      this.model.aggregate([
-        ...pipeline,
+
+    if(page && limit){
+      let skip = (+page - 1) * +limit;
+      pipeline.push(          
         { $skip: skip < 0 ? 0 : skip },
-        { $limit: +limit},
-      ]),
-      this.model.aggregate([...pipeline, { $count: 'count' }]),
-    ]);
+        { $limit: +limit},)
+    }
+
+    const data = await this.model.aggregate([...pipeline])
+    const count = await this.model.aggregate([...pipeline, { $count: 'count' }])
 
     return {
       items: data,
