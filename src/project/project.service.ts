@@ -47,6 +47,15 @@ export class ProjectService {
       },
     ]
 
+    if(filterQuery.status){
+      pipeline.push(
+        {
+          $match : {
+            status:  +filterQuery?.status
+          }
+        },
+      )
+    }
     if(query.search){
       pipeline.push({
         $match: {
