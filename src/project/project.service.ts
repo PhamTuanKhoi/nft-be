@@ -36,6 +36,7 @@ export class ProjectService {
       ...filterQuery
     } = query;
     let skip = (+page - 1) * +limit;
+
     let pipeline: any = [
       {
         $lookup: {
@@ -47,6 +48,16 @@ export class ProjectService {
       },
     ]
 
+    if(query.search){
+      pipeline.push({
+        $match: {
+          name: {
+            $regex: filterQuery?.search || '',
+            $options: 'i',
+          },
+        },
+      })
+    }
     if (sortBy && sortType) {
       pipeline.push({
         $sort: {
@@ -58,7 +69,7 @@ export class ProjectService {
       this.model.aggregate([
         ...pipeline,
         { $skip: skip < 0 ? 0 : skip },
-        { $limit: +limit || 0 },
+        { $limit: +limit},
       ]),
       this.model.aggregate([...pipeline, { $count: 'count' }]),
     ]);

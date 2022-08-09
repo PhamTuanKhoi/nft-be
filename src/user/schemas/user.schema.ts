@@ -30,7 +30,7 @@ export class User extends BaseModel {
   @prop()
   nonce: string;
 
-  @prop({ required: true })
+  @prop()
   address: string;
 
   @prop()
