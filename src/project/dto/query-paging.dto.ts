@@ -5,4 +5,8 @@ export class QueryProjectDto extends PaginationInput {
     @IsOptional()
     @IsString()
     search: string;
+
+    @IsOptional()
+    @IsString()
+    status: number;
   }

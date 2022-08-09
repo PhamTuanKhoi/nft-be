@@ -50,7 +50,7 @@ export class AuthService {
     const user: any = await this.usersService.findOneByUsername(username);
     const payload: JwtPayload = {
       username: user.username,
-      id: user.id,
+      id: user._id,
       address: user.address,
     };
     return {
