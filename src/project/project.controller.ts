@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { QueryProjectDto } from './dto/query-paging.dto';
 
-@Controller('project')
+@Controller('projects')
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
@@ -12,6 +13,10 @@ export class ProjectController {
     return this.projectService.create(createProjectDto);
   }
 
+  @Get('paging')
+  async get(@Query() query: QueryProjectDto) {
+    return await this.projectService.get(query);
+  }
   @Get()
   findAll() {
     return this.projectService.findAll();

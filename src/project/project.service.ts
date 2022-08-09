@@ -3,6 +3,7 @@ import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { ProblemCategoryService } from 'src/problem-category/problem-category.service';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { QueryProjectDto } from './dto/query-paging.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './schema/project.schema';
 
@@ -26,7 +27,51 @@ export class ProjectService {
       throw new BadRequestException(error?.message);   
     }
   }
+  async get (query: QueryProjectDto){
+    const {
+      page,
+      limit,
+      sortType,
+      sortBy,
+      ...filterQuery
+    } = query;
+    let skip = (+page - 1) * +limit;
+    let pipeline: any = [
+      {
+        $lookup: {
+          from: 'problemcategories',
+          localField: 'problemCategory',
+          foreignField: '_id',
+          as: 'problem',
+        },
+      },
+    ]
 
+    if (sortBy && sortType) {
+      pipeline.push({
+        $sort: {
+          [sortBy]: sortType == '-1' ? -1 : 1,
+        },
+      });
+    }
+    const [data, count] = await Promise.all([
+      this.model.aggregate([
+        ...pipeline,
+        { $skip: skip < 0 ? 0 : skip },
+        { $limit: +limit || 0 },
+      ]),
+      this.model.aggregate([...pipeline, { $count: 'count' }]),
+    ]);
+
+    return {
+      items: data,
+      paginate: {
+        page,
+        count: count.length > 0 ? count[0].count : 0,
+        size: limit,
+      },
+    };
+  }
   findAll() {
     try {
       return this.model.find();
@@ -38,7 +83,7 @@ export class ProjectService {
 
   findOne(id: string) {
     try {
-      return this.model.findById(id);
+      return this.model.findById(id).populate('problemCategory');
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);   
