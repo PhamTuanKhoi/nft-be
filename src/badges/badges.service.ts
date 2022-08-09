@@ -1,6 +1,7 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
+import { UserService } from 'src/user/user.service';
 import { CreateBadgeDto } from './dto/create-badge.dto';
 import { UpdateBadgeDto } from './dto/update-badge.dto';
 import { Badges } from './schema/badges.schema';
@@ -11,9 +12,12 @@ export class BadgesService {
   constructor(
     @InjectModel(Badges)
     private readonly model: ReturnModelType<typeof Badges>,
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
   ){}
   async create(createBadgeDto: CreateBadgeDto) {
     try {
+      await this.userService.isModelExist(createBadgeDto.owner)
       const createdBages =  await this.model.create(createBadgeDto)
       this.logger.log(`created a new badges by id#${createdBages?._id}`)
       return createdBages;
@@ -43,6 +47,7 @@ export class BadgesService {
 
   async update(id: string, updateBadgeDto: UpdateBadgeDto) {
     try {
+      await this.userService.isModelExist(updateBadgeDto.owner)
       const updated = await this.model.findByIdAndUpdate(id, updateBadgeDto, {new: true})
       this.logger.log(`updated badges by id#${updated._id}`)
       return updated;

@@ -98,7 +98,12 @@ export class UserService {
     }
     return sender;
   }
-
+  async isModelExist(id, isOptional = false, msg = '') {
+    if (isOptional && !id) return;
+    const errorMessage = msg || `id-> ${User.name} not found`;
+    const isExist = await this.findOne(id);
+    if (!isExist) throw new Error(errorMessage);
+  }
   async findByAddress(address: string) {
     return this.model.findOne({
       address: address.toUpperCase(),

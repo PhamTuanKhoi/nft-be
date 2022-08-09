@@ -1,4 +1,5 @@
-import { prop } from "@typegoose/typegoose";
+import { prop, Ref } from "@typegoose/typegoose";
+import { User } from "src/user/schemas/user.schema";
 
 export class Badges {
     @prop()
@@ -9,4 +10,7 @@ export class Badges {
 
     @prop()
     description: string;
+
+    @prop({ ref: () => User, required: true })
+    owner: Ref<User>;
 }
