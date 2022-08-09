@@ -45,7 +45,7 @@ export class ProblemCategoryService {
         {
           $match: {
             name: {
-              $regex: filterQuery?.name || '',
+              $regex: filterQuery?.search || '',
               $options: 'i',
             },
           },

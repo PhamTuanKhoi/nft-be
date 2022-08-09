@@ -18,6 +18,8 @@ export class CollectionService {
   get = async (
     query: QueryCollectionDto,
   ): Promise<PaginateResponse<Collection>> => {
+
+    console.log(query)
     let tmp = [];
     if (query.search !== undefined && query.search.length > 0) {
       tmp = [

@@ -4,5 +4,5 @@ import { PaginationInput } from "src/global/interfaces/paginate.interface";
 export class QueryProblemCategoryDto extends PaginationInput {
     @IsOptional()
     @IsString()
-    name: string;
+    search: string;
 }
