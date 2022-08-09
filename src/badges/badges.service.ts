@@ -3,6 +3,7 @@ import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { UserService } from 'src/user/user.service';
 import { CreateBadgeDto } from './dto/create-badge.dto';
+import { QueryBadesDto } from './dto/query-badges.dto';
 import { UpdateBadgeDto } from './dto/update-badge.dto';
 import { Badges } from './schema/badges.schema';
 
@@ -27,9 +28,51 @@ export class BadgesService {
     }
   }
 
-  findAll() {
+  async findAll(query: QueryBadesDto) {
+    const {
+      page,
+      limit,
+      sortType,
+      sortBy,
+      ...filterQuery
+    } = query;
+    const skip = (+page - 1) * +limit;
     try {
-      return this.model.find();
+      let pipeline: any = [
+        {
+          $match: {
+            name: {
+              $regex: filterQuery?.search || '',
+              $options: 'i',
+            },
+          },
+        }
+      ]
+
+      if (sortBy && sortType) {
+        pipeline.push({
+          $sort: {
+            [sortBy]: sortType == '-1' ? -1 : 1,
+          },
+        });
+      }
+      const [data, count] = await Promise.all([
+        this.model.aggregate([
+          ...pipeline,
+          { $skip: skip < 0 ? 0 : skip },
+          { $limit: +limit },
+        ]),
+        this.model.aggregate([...pipeline, { $count: 'count' }]),
+      ]);
+
+      return {
+        items: data,
+        paginate: {
+          page,
+          count: count.length > 0 ? count[0].count : 0,
+          size: limit,
+        },
+      };
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);   

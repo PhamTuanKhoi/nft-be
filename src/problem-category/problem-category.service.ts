@@ -40,6 +40,7 @@ export class ProblemCategoryService {
       ...filterQuery
     } = query;
     const skip = (+page - 1) * +limit;
+
     try {
       let pipeline: any = [
         {

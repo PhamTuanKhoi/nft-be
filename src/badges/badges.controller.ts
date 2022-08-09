@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { BadgesService } from './badges.service';
 import { CreateBadgeDto } from './dto/create-badge.dto';
+import { QueryBadesDto } from './dto/query-badges.dto';
 import { UpdateBadgeDto } from './dto/update-badge.dto';
 
 @Controller('badges')
@@ -13,8 +14,8 @@ export class BadgesController {
   }
 
   @Get()
-  findAll() {
-    return this.badgesService.findAll();
+  findAll(@Query() query: QueryBadesDto) {
+    return this.badgesService.findAll(query);
   }
 
   @Get(':id')

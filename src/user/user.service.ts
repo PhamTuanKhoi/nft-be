@@ -22,14 +22,26 @@ export class UserService {
 
   async findAll(query: QueryUserDto): Promise<PaginateResponse<User>> {
     let tmp = [];
-    tmp = [
-      ...tmp,
-      {
-        $sort: {
-          [query.sortBy]: query.sortType,
+
+    if (query.sortBy !== undefined && query.sortBy.length > 0) {
+      tmp = [
+        ...tmp,
+        {
+          $sort: {
+            [query.sortBy]: query.sortType,
+          },
         },
-      },
-    ];
+      ];
+    } else {
+      tmp = [
+        ...tmp,
+        {
+          $sort: {
+            createdAt: 1,
+          },
+        },
+      ];
+    }
     let findQuery = this.model.aggregate(tmp);
     const count = (await findQuery.exec()).length;
     if (
@@ -42,6 +54,7 @@ export class UserService {
         .limit(query.limit)
         .skip((query.page - 1) * query.limit);
     }
+
     const result = await findQuery.exec();
     return {
       items: result,
