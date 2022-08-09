@@ -75,14 +75,16 @@ export class ProjectService {
     }
 
     if(page && limit){
+      console.log(+page)
       let skip = (+page - 1) * +limit;
       pipeline.push(          
         { $skip: skip < 0 ? 0 : skip },
-        { $limit: +limit},)
+        { $limit: +limit}
+      )
     }
 
     const data = await this.model.aggregate([...pipeline])
-    const count = await this.model.aggregate([...pipeline, { $count: 'count' }])
+    const count = await this.model.aggregate([{ $count: 'count' }])
 
     return {
       items: data,
