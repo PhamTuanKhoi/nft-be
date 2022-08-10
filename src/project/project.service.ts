@@ -1,4 +1,4 @@
-import { BadRequestException, forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, HttpException, forwardRef, Inject, Logger, HttpStatus, Injectable } from '@nestjs/common';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { ProblemCategoryService } from 'src/problem-category/problem-category.service';
@@ -15,19 +15,56 @@ export class ProjectService {
     private readonly model: ReturnModelType<typeof Project>,
     @Inject(forwardRef(() => ProblemCategoryService))
     private readonly problemCategoryService: ProblemCategoryService,
-  ){}
+  ) { }
   async create(createProjectDto: CreateProjectDto) {
     try {
       await this.problemCategoryService.isModelExist(createProjectDto.problemCategory)
-      const createdProject =  await this.model.create(createProjectDto)
+      const createdProject = await this.model.create(createProjectDto)
       this.logger.log(`created a new project by id#${createdProject?._id}`)
       return createdProject;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
-      throw new BadRequestException(error?.message);   
+      throw new BadRequestException(error?.message);
     }
   }
-  async get (query: QueryProjectDto){
+  async LikeProjects(id, idNft) {
+    const iduser = id;
+    const nft = await this.model.findById(idNft);
+    const likes = nft?.likes ? nft?.likes : [];
+    if (!nft) {
+      throw new HttpException(
+        "not found nft have id " + idNft,
+        HttpStatus.BAD_REQUEST
+      )
+    }
+    // unlike
+    if (likes.includes(id)) {
+      const data = this.model.findByIdAndUpdate
+        (
+          idNft,
+          { likes: likes.filter((item) => item !== id) },
+          { new: true },
+        )
+      // console.log(data, 'unlike');
+      return data;
+    }
+    if (!likes.includes(id)) {
+      const data = this.model.findByIdAndUpdate
+        (
+          idNft,
+          { likes: [...likes, iduser] },
+          { new: true },
+        )
+      // console.log(data);
+      return data;
+    }
+    // return likes;
+
+    // like
+
+
+  }
+  async get(query: QueryProjectDto) {
     const {
       page,
       limit,
@@ -47,16 +84,17 @@ export class ProjectService {
       },
     ]
 
-    if(filterQuery.status){
+    if (+filterQuery.status !== -1) {
+      // console.log("hhhh");
       pipeline.push(
         {
-          $match : {
-            status:  +filterQuery?.status
+          $match: {
+            status: +filterQuery?.status
           }
         },
       )
     }
-    if(query.search){
+    if (query.search) {
       pipeline.push({
         $match: {
           name: {
@@ -66,6 +104,8 @@ export class ProjectService {
         },
       })
     }
+    // console.log(query);
+
     if (sortBy && sortType) {
       pipeline.push({
         $sort: {
@@ -74,12 +114,12 @@ export class ProjectService {
       });
     }
 
-    if(page && limit){
+    if (page && limit) {
       console.log(+page)
       let skip = (+page - 1) * +limit;
-      pipeline.push(          
+      pipeline.push(
         { $skip: skip < 0 ? 0 : skip },
-        { $limit: +limit}
+        { $limit: +limit }
       )
     }
 
@@ -100,7 +140,7 @@ export class ProjectService {
       return this.model.find();
     } catch (error) {
       this.logger.error(error?.message, error.stack);
-      throw new BadRequestException(error?.message);   
+      throw new BadRequestException(error?.message);
     }
   }
 
@@ -109,19 +149,19 @@ export class ProjectService {
       return this.model.findById(id).populate('problemCategory');
     } catch (error) {
       this.logger.error(error?.message, error.stack);
-      throw new BadRequestException(error?.message);   
+      throw new BadRequestException(error?.message);
     }
   }
 
   async update(id: string, updateProjectDto: UpdateProjectDto) {
     try {
       await this.problemCategoryService.isModelExist(updateProjectDto.problemCategory)
-      const updated = await this.model.findByIdAndUpdate(id, updateProjectDto, {new: true})
+      const updated = await this.model.findByIdAndUpdate(id, updateProjectDto, { new: true })
       this.logger.log(`updated project by id#${updated._id}`)
       return updated;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
-      throw new BadRequestException(error?.message);   
+      throw new BadRequestException(error?.message);
     }
   }
 
@@ -132,7 +172,7 @@ export class ProjectService {
       return removed;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
-      throw new BadRequestException(error?.message);   
+      throw new BadRequestException(error?.message);
     }
   }
 }

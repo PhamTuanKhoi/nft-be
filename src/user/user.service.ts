@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { RegisterUserDto } from './dtos/register-user.dto';
 import { User } from './schemas/user.schema';
 import * as bcrypt from 'bcrypt';
@@ -13,11 +13,13 @@ import { ethers } from 'ethers';
 import { UserStatusEnum } from './interfaces/userStatus.enum';
 import { v4 as uuidv4 } from 'uuid';
 import { UserRoleEnum } from './interfaces/userRole.enum';
-
+import { ProjectService } from 'src/project/project.service';
 @Injectable()
 export class UserService {
   constructor(
-    @InjectModel(User) private readonly model: ReturnModelType<typeof User>,
+    @InjectModel(User)
+    private readonly model: ReturnModelType<typeof User>,
+    // private readonly projects: ProjectService
   ) { }
 
   async findAll(query: QueryUserDto): Promise<PaginateResponse<User>> {
@@ -98,6 +100,8 @@ export class UserService {
     const created = await newUser.save();
     return this.findOne(created.id);
   }
+ 
+
 
   async remove(id: ID): Promise<User> {
     return this.model.findByIdAndRemove(id);

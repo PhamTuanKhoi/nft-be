@@ -59,4 +59,7 @@ export class User extends BaseModel {
 
   @prop({ default: false })
   feature: boolean;
+
+  @prop({ default: [] })
+  like: Ref<User>[]
 }

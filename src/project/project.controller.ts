@@ -6,8 +6,12 @@ import { QueryProjectDto } from './dto/query-paging.dto';
 
 @Controller('projects')
 export class ProjectController {
-  constructor(private readonly projectService: ProjectService) {}
+  constructor(private readonly projectService: ProjectService) { }
 
+  @Post('/likeProject/:id/:idNft')
+  async likeProject(@Param('id') id: string, @Param('idNft') idNft: string) {
+    return await this.projectService.LikeProjects(id, idNft);
+  }
   @Post()
   create(@Body() createProjectDto: CreateProjectDto) {
     return this.projectService.create(createProjectDto);

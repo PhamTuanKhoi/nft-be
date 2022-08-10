@@ -43,4 +43,7 @@ export class Project {
 
     @prop({ default: [] })
     viewers: Ref<User>[];
+    
+    @prop({ default: [] })
+    likes: Ref<User>[];
 }
