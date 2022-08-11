@@ -88,6 +88,13 @@ export class BadgesService {
     }
   }
 
+  async isModelExist(id, isOptional = false, msg = '') {
+    if (isOptional && !id) return;
+    const errorMessage = msg || `id-> ${Badges.name} not found`;
+    const isExist = await this.findOne(id);
+    if (!isExist) throw new Error(errorMessage);
+  }
+
   async update(id: string, updateBadgeDto: UpdateBadgeDto) {
     try {
       // await this.userService.isModelExist(updateBadgeDto.owner);

@@ -1,9 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { WinerService } from './winer.service';
 import { CreateWinerDto } from './dto/create-winer.dto';
 import { UpdateWinerDto } from './dto/update-winer.dto';
 
-@Controller('winer')
+@Controller('winers')
 export class WinerController {
   constructor(private readonly winerService: WinerService) {}
 

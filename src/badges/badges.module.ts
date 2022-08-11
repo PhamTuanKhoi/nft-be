@@ -8,6 +8,7 @@ import { UserModule } from 'src/user/user.module';
 @Module({
   imports: [TypegooseModule.forFeature([Badges]), forwardRef(() => UserModule)],
   controllers: [BadgesController],
-  providers: [BadgesService]
+  providers: [BadgesService],
+  exports: [BadgesService],
 })
 export class BadgesModule {}
