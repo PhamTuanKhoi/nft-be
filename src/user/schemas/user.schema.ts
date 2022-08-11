@@ -57,9 +57,12 @@ export class User extends BaseModel {
   @prop({ default: false })
   verified: false;
 
+  @prop({ default: UserRoleEnum.USER })
+  role: UserRoleEnum;
+
   @prop({ default: false })
   feature: boolean;
 
   @prop({ default: [] })
-  like: Ref<User>[]
+  like: Ref<User>[];
 }

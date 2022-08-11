@@ -22,6 +22,7 @@ export class QueryDto {
   sortBy: string;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @IsEnum([-1, 1])
   sortType: number;

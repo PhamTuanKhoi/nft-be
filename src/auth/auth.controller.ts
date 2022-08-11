@@ -11,15 +11,19 @@ import { ResetPasswordDto } from '../user/dtos/reset-password.dto';
 import { UpdateUserDto } from 'src/user/dtos/update-user.dto';
 import { LoginWalletDto } from 'src/user/dtos/login-wallet.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { UserService } from 'src/user/user.service';
 
 @ApiTags('AUTH')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly service: AuthService) {}
+  constructor(
+    private readonly service: AuthService,
+    private readonly userService: UserService,
+  ) {}
 
   @Post('register')
   async register(@Body() registerUser: RegisterUserDto) {
-    return await this.service.register(registerUser);
+    return await this.userService.register(registerUser);
   }
 
   @UseGuards(LocalAuthGuard)

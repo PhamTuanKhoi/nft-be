@@ -28,6 +28,11 @@ export class RegisterUserDto {
   @Length(4, 30)
   password: string;
 
+  @IsString()
+  @Type(() => String)
+  @Length(4, 30)
+  confirmPassword: string;
+
   @IsOptional()
   @IsString()
   @Type(() => String)

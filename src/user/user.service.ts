@@ -1,4 +1,9 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { RegisterUserDto } from './dtos/register-user.dto';
 import { User } from './schemas/user.schema';
 import * as bcrypt from 'bcrypt';
@@ -19,8 +24,8 @@ export class UserService {
   constructor(
     @InjectModel(User)
     private readonly model: ReturnModelType<typeof User>,
-    // private readonly projects: ProjectService
-  ) { }
+  ) // private readonly projects: ProjectService
+  {}
 
   async findAll(query: QueryUserDto): Promise<PaginateResponse<User>> {
     let tmp = [];
@@ -100,8 +105,6 @@ export class UserService {
     const created = await newUser.save();
     return this.findOne(created.id);
   }
- 
-
 
   async remove(id: ID): Promise<User> {
     return this.model.findByIdAndRemove(id);
@@ -127,6 +130,32 @@ export class UserService {
     });
   }
 
+  async register(registerUser: RegisterUserDto): Promise<User> {
+    if (registerUser.password !== registerUser.confirmPassword) {
+      throw new HttpException(
+        'Confirm password incorrect !',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const findUserByEmail = await this.model.findOne({
+      email: registerUser.email,
+    });
+
+    if (findUserByEmail) {
+      throw new HttpException('Email already exists', HttpStatus.BAD_REQUEST);
+    }
+    const newUser = new this.model({
+      ...registerUser,
+      role: UserRoleEnum.ADMIN,
+    });
+
+    newUser.password = await bcrypt.hash(registerUser.password, 10);
+
+    const created = await newUser.save();
+
+    return this.findOne(created.id);
+  }
+
   async createByAddress(address: string) {
     return this.model.create({
       address: address.toUpperCase(),
@@ -143,7 +172,7 @@ export class UserService {
   }
 
   async update(id, user) {
-    return this.model.findByIdAndUpdate(id, user, { new: true })
+    return this.model.findByIdAndUpdate(id, user, { new: true });
   }
   // async generateOnceFromAddress(address: string) {
   //   const user = await this.findByAddress(address);
