@@ -26,7 +26,11 @@ export class MiningService {
         },
       ];
     }
-    if (query.sortBy !== undefined && query.sortBy.length > 0) {
+    if (
+      query.sortBy !== undefined &&
+      query.sortBy.length > 0 &&
+      query.sortType
+    ) {
       tmp = [
         ...tmp,
         {

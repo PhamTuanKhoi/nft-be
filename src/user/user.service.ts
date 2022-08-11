@@ -23,14 +23,27 @@ import { ProjectService } from 'src/project/project.service';
 export class UserService {
   constructor(
     @InjectModel(User)
-    private readonly model: ReturnModelType<typeof User>,
-  ) // private readonly projects: ProjectService
-  {}
+    private readonly model: ReturnModelType<typeof User>, // private readonly projects: ProjectService
+  ) {}
 
   async findAll(query: QueryUserDto): Promise<PaginateResponse<User>> {
     let tmp = [];
 
-    if (query.sortBy !== undefined && query.sortBy.length > 0) {
+    if (query.search !== undefined && query.search.length > 0) {
+      tmp = [
+        ...tmp,
+        {
+          $match: {
+            username: { $regex: '.*' + query.search + '.*', $options: 'i' },
+          },
+        },
+      ];
+    }
+    if (
+      query.sortBy !== undefined &&
+      query.sortBy.length > 0 &&
+      query.sortType
+    ) {
       tmp = [
         ...tmp,
         {

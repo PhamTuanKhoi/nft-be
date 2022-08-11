@@ -18,8 +18,6 @@ export class CollectionService {
   get = async (
     query: QueryCollectionDto,
   ): Promise<PaginateResponse<Collection>> => {
-
-    console.log(query)
     let tmp = [];
     if (query.search !== undefined && query.search.length > 0) {
       tmp = [
@@ -32,7 +30,11 @@ export class CollectionService {
       ];
     }
 
-    if (query.sortBy !== undefined && query.sortBy.length > 0) {
+    if (
+      query.sortBy !== undefined &&
+      query.sortBy.length > 0 &&
+      query.sortType
+    ) {
       tmp = [
         ...tmp,
         {

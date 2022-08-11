@@ -1,4 +1,10 @@
-import { BadRequestException, forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { UserService } from 'src/user/user.service';
@@ -15,27 +21,21 @@ export class BadgesService {
     private readonly model: ReturnModelType<typeof Badges>,
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
-  ){}
+  ) {}
   async create(createBadgeDto: CreateBadgeDto) {
     try {
-      await this.userService.isModelExist(createBadgeDto.owner)
-      const createdBages =  await this.model.create(createBadgeDto)
-      this.logger.log(`created a new badges by id#${createdBages?._id}`)
+      // await this.userService.isModelExist(createBadgeDto.owner)
+      const createdBages = await this.model.create(createBadgeDto);
+      this.logger.log(`created a new badges by id#${createdBages?._id}`);
       return createdBages;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
-      throw new BadRequestException(error?.message);   
+      throw new BadRequestException(error?.message);
     }
   }
 
   async findAll(query: QueryBadesDto) {
-    const {
-      page,
-      limit,
-      sortType,
-      sortBy,
-      ...filterQuery
-    } = query;
+    const { page, limit, sortType, sortBy, ...filterQuery } = query;
     const skip = (+page - 1) * +limit;
     try {
       let pipeline: any = [
@@ -46,8 +46,8 @@ export class BadgesService {
               $options: 'i',
             },
           },
-        }
-      ]
+        },
+      ];
 
       if (sortBy && sortType) {
         pipeline.push({
@@ -75,7 +75,7 @@ export class BadgesService {
       };
     } catch (error) {
       this.logger.error(error?.message, error.stack);
-      throw new BadRequestException(error?.message);   
+      throw new BadRequestException(error?.message);
     }
   }
 
@@ -84,30 +84,32 @@ export class BadgesService {
       return this.model.findById(id);
     } catch (error) {
       this.logger.error(error?.message, error.stack);
-      throw new BadRequestException(error?.message);   
+      throw new BadRequestException(error?.message);
     }
   }
 
   async update(id: string, updateBadgeDto: UpdateBadgeDto) {
     try {
-      await this.userService.isModelExist(updateBadgeDto.owner)
-      const updated = await this.model.findByIdAndUpdate(id, updateBadgeDto, {new: true})
-      this.logger.log(`updated badges by id#${updated._id}`)
+      // await this.userService.isModelExist(updateBadgeDto.owner);
+      const updated = await this.model.findByIdAndUpdate(id, updateBadgeDto, {
+        new: true,
+      });
+      this.logger.log(`updated badges by id#${updated._id}`);
       return updated;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
-      throw new BadRequestException(error?.message);   
+      throw new BadRequestException(error?.message);
     }
   }
 
   async remove(id: string) {
     try {
-      const removed = await this.model.findByIdAndDelete(id)
-      this.logger.log(`removed badges by id#${removed._id}`)
+      const removed = await this.model.findByIdAndDelete(id);
+      this.logger.log(`removed badges by id#${removed._id}`);
       return removed;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
-      throw new BadRequestException(error?.message);   
+      throw new BadRequestException(error?.message);
     }
   }
 }

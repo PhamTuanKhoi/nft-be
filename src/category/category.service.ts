@@ -24,12 +24,16 @@ export class CategoryService {
         ...tmp,
         {
           $match: {
-            name: { $regex: '.*' + query.search + '.*', $options: 'i' },
+            title: { $regex: '.*' + query.search + '.*', $options: 'i' },
           },
         },
       ];
     }
-    if (query.sortBy !== undefined && query.sortBy.length > 0) {
+    if (
+      query.sortBy !== undefined &&
+      query.sortBy.length > 0 &&
+      query.sortType
+    ) {
       tmp = [
         ...tmp,
         {
