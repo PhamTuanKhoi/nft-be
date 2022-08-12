@@ -65,4 +65,7 @@ export class User extends BaseModel {
 
   @prop({ default: [] })
   like: Ref<User>[];
+
+  @prop({ default: 0 })
+  power: number;
 }

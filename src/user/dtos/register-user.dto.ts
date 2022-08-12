@@ -1,7 +1,15 @@
 import { Type } from 'class-transformer';
 import { UserRoleEnum } from '../interfaces/userRole.enum';
 import { UserStatusEnum } from '../interfaces/userStatus.enum';
-import { IsBoolean, IsEnum, IsOptional, Length, IsString, IsEmail} from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsOptional,
+  Length,
+  IsString,
+  IsEmail,
+  IsNumber,
+} from 'class-validator';
 
 export class RegisterUserDto {
   @IsOptional()
@@ -63,4 +71,8 @@ export class RegisterUserDto {
   @IsString()
   @Type(() => String)
   discord: string;
+
+  @IsOptional()
+  @IsNumber()
+  power: number;
 }

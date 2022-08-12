@@ -27,13 +27,13 @@ import { User } from './schemas/user.schema';
 @ApiTags('USER')
 @Controller('users')
 export class UserController {
-  constructor(private readonly service: UserService) { }
+  constructor(private readonly service: UserService) {}
 
   @Get()
   async index(@Query() query: QueryUserDto) {
     return await this.service.findAll(query);
   }
-  
+
   @Get('/:id/nfts')
   @ApiOperation({ summary: 'list nft' })
   @ApiResponse({
@@ -54,12 +54,10 @@ export class UserController {
     return await this.service.findOne(id);
   }
 
-
   @Delete(':id')
   async remove(@Param('id', ParseIdPipe) id: ID) {
     return await this.service.remove(id);
   }
-
 
   // @Patch(':a/follow/:b')
   // async follow(@Param('a', ParseIdPipe) a: ID, @Param('b', ParseIdPipe) b: ID) {

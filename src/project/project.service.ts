@@ -82,6 +82,22 @@ export class ProjectService {
           as: 'problem',
         },
       },
+      {
+        $unwind: '$likes',
+      },
+      {
+        $addFields: {
+          liker: { $toObjectId: '$likes' },
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'liker',
+          foreignField: '_id',
+          as: 'users',
+        },
+      },
     ];
 
     if (filterQuery.status !== undefined) {

@@ -19,8 +19,10 @@ import { UserStatusEnum } from './interfaces/userStatus.enum';
 import { v4 as uuidv4 } from 'uuid';
 import { UserRoleEnum } from './interfaces/userRole.enum';
 import { ProjectService } from 'src/project/project.service';
+import { Logger } from 'ethers/lib/utils';
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
   constructor(
     @InjectModel(User)
     private readonly model: ReturnModelType<typeof User>, // private readonly projects: ProjectService
@@ -194,7 +196,24 @@ export class UserService {
   }
 
   async update(id, user) {
-    return this.model.findByIdAndUpdate(id, user, { new: true });
+    try {
+      const data = await this.findOne(id);
+      if (!data) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
+      let isPower = data?.power + user?.power;
+      const updatedUser = await this.model.findByIdAndUpdate(
+        id,
+        { ...user, power: isPower },
+        {
+          new: true,
+        },
+      );
+      return updatedUser;
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException(error?.message);
+    }
   }
   // async generateOnceFromAddress(address: string) {
   //   const user = await this.findByAddress(address);
