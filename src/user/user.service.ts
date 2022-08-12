@@ -27,7 +27,16 @@ export class UserService {
   ) {}
 
   async findAll(query: QueryUserDto): Promise<PaginateResponse<User>> {
-    let tmp = [];
+    let tmp: any = [
+      {
+        $lookup: {
+          from: 'winers',
+          localField: '_id',
+          foreignField: 'user',
+          as: 'winers',
+        },
+      },
+    ];
 
     if (query.search !== undefined && query.search.length > 0) {
       tmp = [

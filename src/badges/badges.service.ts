@@ -47,6 +47,14 @@ export class BadgesService {
             },
           },
         },
+        {
+          $lookup: {
+            from: 'winers',
+            localField: '_id',
+            foreignField: 'badges',
+            as: 'win',
+          },
+        },
       ];
 
       if (sortBy && sortType) {
