@@ -82,18 +82,18 @@ export class ProjectService {
           as: 'problem',
         },
       },
-      {
-        $unwind: '$likes',
-      },
-      {
-        $addFields: {
-          liker: { $toObjectId: '$likes' },
-        },
-      },
+      // {
+      //   $unwind: '$likes',
+      // },
+      // {
+      //   $addFields: {
+      //     liker: { $toObjectId: '$likes' },
+      //   },
+      // },
       {
         $lookup: {
           from: 'users',
-          localField: 'liker',
+          localField: 'likes',
           foreignField: '_id',
           as: 'users',
         },
