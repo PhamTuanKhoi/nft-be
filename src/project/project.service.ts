@@ -37,38 +37,35 @@ export class ProjectService {
       throw new BadRequestException(error?.message);
     }
   }
-  async LikeProjects(id, idNft) {
+  async LikeProjects(id, idproject) {
     const iduser = id;
-    const nft = await this.model.findById(idNft);
+    const nft = await this.model.findById(idproject);
     const likes = nft?.likes ? nft?.likes : [];
     if (!nft) {
       throw new HttpException(
-        'not found nft have id ' + idNft,
+        'not found nft have id ' + idproject,
         HttpStatus.BAD_REQUEST,
       );
     }
     // unlike
     if (likes.includes(id)) {
       const data = this.model.findByIdAndUpdate(
-        idNft,
-        { likes: likes.filter((item) => item !== id) },
+        idproject,
+        {
+          likes: likes.filter((item) => item.toString() !== iduser.toString()),
+        },
         { new: true },
       );
-      // console.log(data, 'unlike');
       return data;
     }
     if (!likes.includes(id)) {
       const data = this.model.findByIdAndUpdate(
-        idNft,
+        idproject,
         { likes: [...likes, iduser] },
         { new: true },
       );
-      // console.log(data);
       return data;
     }
-    // return likes;
-
-    // like
   }
   async get(query: QueryProjectDto) {
     const { page, limit, sortType, sortBy, ...filterQuery } = query;
@@ -82,14 +79,6 @@ export class ProjectService {
           as: 'problem',
         },
       },
-      // {
-      //   $unwind: '$likes',
-      // },
-      // {
-      //   $addFields: {
-      //     liker: { $toObjectId: '$likes' },
-      //   },
-      // },
       {
         $lookup: {
           from: 'users',
