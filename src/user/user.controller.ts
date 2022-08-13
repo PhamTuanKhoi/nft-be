@@ -34,6 +34,15 @@ export class UserController {
     return await this.service.findAll(query);
   }
 
+  @Get('likes/:id')
+  async getUserLikes(@Param('id') id: string) {
+    return await this.service.getUserLikes(id);
+  }
+
+  @Get('/address/:address')
+  async findByAddress(@Param('address') address: string) {
+    return await this.service.findByAddress(address);
+  }
   @Get('/:id/nfts')
   @ApiOperation({ summary: 'list nft' })
   @ApiResponse({
@@ -57,29 +66,6 @@ export class UserController {
   @Delete(':id')
   async remove(@Param('id', ParseIdPipe) id: ID) {
     return await this.service.remove(id);
-  }
-
-  // @Patch(':a/follow/:b')
-  // async follow(@Param('a', ParseIdPipe) a: ID, @Param('b', ParseIdPipe) b: ID) {
-  //   return await this.service.follow(a, b);
-  // }
-
-  // @Patch(':a/unfollow/:b')
-  // async unFollow(
-  //   @Param('a', ParseIdPipe) a: ID,
-  //   @Param('b', ParseIdPipe) b: ID,
-  // ) {
-  //   return await this.service.unFollow(a, b);
-  // }
-
-  // @Patch()
-  // async createOrUpdate(@Body() payload: UpdateUserDto) {
-  //   return await this.service.createOrUpdate(payload);
-  // }
-
-  @Get('/address/:address')
-  async findByAddress(@Param('address') address: string) {
-    return await this.service.findByAddress(address);
   }
 
   @Post('/nonce')

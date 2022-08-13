@@ -3,6 +3,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  Logger,
 } from '@nestjs/common';
 import { RegisterUserDto } from './dtos/register-user.dto';
 import { User } from './schemas/user.schema';
@@ -19,10 +20,10 @@ import { UserStatusEnum } from './interfaces/userStatus.enum';
 import { v4 as uuidv4 } from 'uuid';
 import { UserRoleEnum } from './interfaces/userRole.enum';
 import { ProjectService } from 'src/project/project.service';
-import { Logger } from 'ethers/lib/utils';
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserService.name);
+
   constructor(
     @InjectModel(User)
     private readonly model: ReturnModelType<typeof User>, // private readonly projects: ProjectService
@@ -95,6 +96,31 @@ export class UserService {
         count,
       },
     };
+  }
+
+  async getUserLikes(id) {
+    try {
+      return await this.model.aggregate([
+        {
+          $match: {
+            $expr: {
+              $eq: ['$_id', { $toObjectId: id }],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'projects',
+            localField: '_id',
+            foreignField: 'likes',
+            as: 'projects',
+          },
+        },
+      ]);
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
   }
 
   async findOne(id: ID) {
