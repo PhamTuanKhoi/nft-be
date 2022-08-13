@@ -18,5 +18,5 @@ export abstract class BaseModel {
   updatedAt: Date; // provided by schemaOptions.timestamps
 
   @prop()
-  _id: Schema.Types.ObjectId
+  id: Schema.Types.ObjectId;
 }

@@ -1,12 +1,15 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsString } from 'class-validator';
 import { IsOptional, IsIn } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class QueryDto {
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  page: number;
 
   @IsOptional()
   @IsString()
-  @Type(() => String)
   search: string;
 
   @IsOptional()
@@ -15,18 +18,12 @@ export class QueryDto {
   limit: number;
 
   @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  page: number;
-
-  @IsOptional()
   @IsString()
-  @Type(() => String)
-  sortBy = 'createdAt';
+  sortBy: string;
 
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  @IsIn([-1, 1])
-  sortType = -1;
+  @IsEnum([-1, 1])
+  sortType: number;
 }

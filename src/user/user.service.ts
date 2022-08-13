@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { RegisterUserDto } from './dtos/register-user.dto';
 import { User } from './schemas/user.schema';
 import * as bcrypt from 'bcrypt';
@@ -13,28 +19,74 @@ import { ethers } from 'ethers';
 import { UserStatusEnum } from './interfaces/userStatus.enum';
 import { v4 as uuidv4 } from 'uuid';
 import { UserRoleEnum } from './interfaces/userRole.enum';
-
+import { ProjectService } from 'src/project/project.service';
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
+
   constructor(
-    @InjectModel(User) private readonly model: ReturnModelType<typeof User>,
-  ) { }
+    @InjectModel(User)
+    private readonly model: ReturnModelType<typeof User>, // private readonly projects: ProjectService
+  ) {}
 
   async findAll(query: QueryUserDto): Promise<PaginateResponse<User>> {
-    let tmp = [];
-    tmp = [
-      ...tmp,
+    let tmp: any = [
       {
-        $sort: {
-          [query.sortBy]: query.sortType
-        }
-      }
-    ]
+        $lookup: {
+          from: 'winers',
+          localField: '_id',
+          foreignField: 'user',
+          as: 'winers',
+        },
+      },
+    ];
+
+    if (query.search !== undefined && query.search.length > 0) {
+      tmp = [
+        ...tmp,
+        {
+          $match: {
+            username: { $regex: '.*' + query.search + '.*', $options: 'i' },
+          },
+        },
+      ];
+    }
+    if (
+      query.sortBy !== undefined &&
+      query.sortBy.length > 0 &&
+      query.sortType
+    ) {
+      tmp = [
+        ...tmp,
+        {
+          $sort: {
+            [query.sortBy]: query.sortType,
+          },
+        },
+      ];
+    } else {
+      tmp = [
+        ...tmp,
+        {
+          $sort: {
+            createdAt: 1,
+          },
+        },
+      ];
+    }
     let findQuery = this.model.aggregate(tmp);
     const count = (await findQuery.exec()).length;
-    if (query.limit !== undefined && query.page !== undefined && query.limit > 0 && query.page > 0) {
-      findQuery = findQuery.limit(query.limit).skip((query.page - 1) * query.limit);
+    if (
+      query.limit !== undefined &&
+      query.page !== undefined &&
+      query.limit > 0 &&
+      query.page > 0
+    ) {
+      findQuery = findQuery
+        .limit(query.limit)
+        .skip((query.page - 1) * query.limit);
     }
+
     const result = await findQuery.exec();
     return {
       items: result,
@@ -44,6 +96,31 @@ export class UserService {
         count,
       },
     };
+  }
+
+  async getUserLikes(id) {
+    try {
+      return await this.model.aggregate([
+        {
+          $match: {
+            $expr: {
+              $eq: ['$_id', { $toObjectId: id }],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'projects',
+            localField: '_id',
+            foreignField: 'likes',
+            as: 'projects',
+          },
+        },
+      ]);
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
   }
 
   async findOne(id: ID) {
@@ -83,20 +160,50 @@ export class UserService {
     return this.model.findByIdAndRemove(id);
   }
 
-  
-
   async findOrCreateByAddress(address: string) {
     let sender = await this.findByAddress(address);
+
     if (!sender) {
       sender = await this.createByAddress(address);
     }
     return sender;
   }
-
+  async isModelExist(id, isOptional = false, msg = '') {
+    if (isOptional && !id) return;
+    const errorMessage = msg || `id-> ${User.name} not found`;
+    const isExist = await this.findOne(id);
+    if (!isExist) throw new Error(errorMessage);
+  }
   async findByAddress(address: string) {
     return this.model.findOne({
       address: address.toUpperCase(),
     });
+  }
+
+  async register(registerUser: RegisterUserDto): Promise<User> {
+    if (registerUser.password !== registerUser.confirmPassword) {
+      throw new HttpException(
+        'Confirm password incorrect !',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const findUserByEmail = await this.model.findOne({
+      email: registerUser.email,
+    });
+
+    if (findUserByEmail) {
+      throw new HttpException('Email already exists', HttpStatus.BAD_REQUEST);
+    }
+    const newUser = new this.model({
+      ...registerUser,
+      role: UserRoleEnum.ADMIN,
+    });
+
+    newUser.password = await bcrypt.hash(registerUser.password, 10);
+
+    const created = await newUser.save();
+
+    return this.findOne(created.id);
   }
 
   async createByAddress(address: string) {
@@ -114,27 +221,47 @@ export class UserService {
     });
   }
 
-  async generateOnceFromAddress(address: string) {
-    const user = await this.findByAddress(address);
-    if (user) {
-      let nonce = crypto.randomBytes(16).toString('base64');
-      nonce = ethers.utils.formatBytes32String(nonce);
-      user.nonce = nonce;
-      await user.save();
-      return nonce;
+  async update(id, user) {
+    try {
+      const data = await this.findOne(id);
+      if (!data) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
+      let isPower = data?.power + user?.power;
+      const updatedUser = await this.model.findByIdAndUpdate(
+        id,
+        { ...user, power: isPower },
+        {
+          new: true,
+        },
+      );
+      return updatedUser;
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException(error?.message);
     }
-
-    let nonce = crypto.randomBytes(16).toString('base64');
-    nonce = ethers.utils.formatBytes32String(nonce);
-
-    const newUser = new this.model({
-      address: address.toUpperCase(),
-      username: uuidv4(),
-      title: 'Unnamed',
-      status: UserStatusEnum.ACTIVE,
-      nonce,
-    });
-    await newUser.save();
-    return nonce;
   }
+  // async generateOnceFromAddress(address: string) {
+  //   const user = await this.findByAddress(address);
+  //   if (user) {
+  //     let nonce = crypto.randomBytes(16).toString('base64');
+  //     nonce = ethers.utils.formatBytes32String(nonce);
+  //     user.nonce = nonce;
+  //     // await user.save();
+  //     return nonce;
+  //   }
+
+  //   let nonce = crypto.randomBytes(16).toString('base64');
+  //   nonce = ethers.utils.formatBytes32String(nonce);
+
+  //   const newUser = new this.model({
+  //     address: address.toUpperCase(),
+  //     username: uuidv4(),
+  //     title: 'Unnamed',
+  //     status: UserStatusEnum.ACTIVE,
+  //     nonce,
+  //   });
+  //   await newUser.save();
+  //   return nonce;
+  // }
 }

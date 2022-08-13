@@ -10,14 +10,20 @@ import { Auth } from './decorator/auth.decorator';
 import { ResetPasswordDto } from '../user/dtos/reset-password.dto';
 import { UpdateUserDto } from 'src/user/dtos/update-user.dto';
 import { LoginWalletDto } from 'src/user/dtos/login-wallet.dto';
+import { ApiTags } from '@nestjs/swagger';
+import { UserService } from 'src/user/user.service';
 
+@ApiTags('AUTH')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly service: AuthService) {}
+  constructor(
+    private readonly service: AuthService,
+    private readonly userService: UserService,
+  ) {}
 
   @Post('register')
   async register(@Body() registerUser: RegisterUserDto) {
-    return await this.service.register(registerUser);
+    return await this.userService.register(registerUser);
   }
 
   @UseGuards(LocalAuthGuard)
@@ -28,7 +34,7 @@ export class AuthController {
 
   @Post('wallet_login')
   async loginByWallet(@Body() loginDto: LoginWalletDto) {
-    return await this.service.genTokenFromSign(loginDto.address, loginDto.sign);
+    return await this.service.genTokenFromSign(loginDto.address);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -39,10 +45,22 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('profile')
+  async updateProfile(
+    @Auth() auth: JwtPayload,
+    @Body() profile: UpdateUserDto,
+  ) {
+    return await this.service.updateProfile(auth.id, profile);
+  }
 
   @Post('reset_request')
   async requestReset(@Body() payload: ResetRequestDto) {
     await this.service.resetRequest(payload.email);
     return 'Email was sent';
+  }
+
+  @Post('reset_password')
+  async resetPassword(@Body() payload: ResetPasswordDto) {
+    await this.service.resetPassword(payload);
+    return 'Reset password successfully';
   }
 }

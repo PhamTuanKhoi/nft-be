@@ -8,3 +8,13 @@ export interface PaginateMeta {
   page: number;
   limit: number;
 }
+
+
+export class PaginationInput {
+  limit: number;
+  page: number;
+  sortBy?: string;
+  sortType?: string | number;
+  searchBy?: string;
+  searchType?: string | number;
+}
