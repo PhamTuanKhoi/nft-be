@@ -43,6 +43,15 @@ export class WinerService {
     return `This action returns all winer`;
   }
 
+  async findByUser(id: string) {
+    try {
+      return await this.model.find({ user: id }).populate('badges');
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} winer`;
   }
