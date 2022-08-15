@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { prop, ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { ID } from 'src/global/interfaces/id.interface';
@@ -100,6 +105,14 @@ export class NftService {
       .populate('collectionNft');
   };
 
+  async findOne(id: string) {
+    try {
+      return this.model.findById(id).lean();
+    } catch (error) {
+      console.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
   getById = async (id: ID): Promise<NFT> => {
     return this.model
       .findById(id)

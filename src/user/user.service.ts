@@ -1,7 +1,9 @@
 import {
   BadRequestException,
+  forwardRef,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   Logger,
 } from '@nestjs/common';
@@ -20,13 +22,19 @@ import { UserStatusEnum } from './interfaces/userStatus.enum';
 import { v4 as uuidv4 } from 'uuid';
 import { UserRoleEnum } from './interfaces/userRole.enum';
 import { ProjectService } from 'src/project/project.service';
+import { NftService } from 'src/nft/nft.service';
+import { MiningService } from 'src/mining/mining.service';
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserService.name);
 
   constructor(
     @InjectModel(User)
-    private readonly model: ReturnModelType<typeof User>, // private readonly projects: ProjectService
+    private readonly model: ReturnModelType<typeof User>,
+    @Inject(forwardRef(() => NftService))
+    private readonly nftService: NftService,
+    @Inject(forwardRef(() => MiningService))
+    private readonly miningService: MiningService,
   ) {}
 
   async findAll(query: QueryUserDto): Promise<PaginateResponse<User>> {
@@ -117,6 +125,44 @@ export class UserService {
           },
         },
       ]);
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+  async isUpdatePower(id, payload) {
+    const data = await this.findOne(id);
+    if (!data) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    let isPower = data?.power + payload?.isPower;
+    console.log(data?.power, payload?.isPower, isPower);
+    const updatedPower = await this.model.findByIdAndUpdate(
+      id,
+      { power: isPower },
+      { new: true },
+    );
+    this.logger.log(`updated a power user by id#${updatedPower?._id}`);
+    return updatedPower;
+  }
+
+  async updatePower(id: string, nft: string) {
+    try {
+      const isNft = await this.nftService.findOne(nft);
+      console.log(isNft.level);
+      if (!isNft) {
+        throw new HttpException('Nft not found', HttpStatus.NOT_FOUND);
+      }
+      const mining = await this.miningService.getByLevel(isNft?.level);
+      if (!mining) {
+        throw new HttpException(
+          `Mining not found level#${isNft?.level}`,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      let isPower = mining.price * mining.multiplier;
+      const updatedPower = await this.isUpdatePower(id, { isPower });
+      return updatedPower;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);
@@ -223,21 +269,13 @@ export class UserService {
 
   async update(id, user) {
     try {
-      const data = await this.findOne(id);
-      if (!data) {
-        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-      }
-      let isPower = data?.power + user?.power;
-      const updatedUser = await this.model.findByIdAndUpdate(
-        id,
-        { ...user, power: isPower },
-        {
-          new: true,
-        },
-      );
+      const updatedUser = await this.model.findByIdAndUpdate(id, user, {
+        new: true,
+      });
+      this.logger.log(`updated a power user by id#${updatedUser?._id}`);
       return updatedUser;
     } catch (error) {
-      console.log(error);
+      this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);
     }
   }

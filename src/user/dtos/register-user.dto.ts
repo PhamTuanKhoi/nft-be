@@ -10,6 +10,7 @@ import {
   IsEmail,
   IsNumber,
 } from 'class-validator';
+import { BaseModel } from 'src/global/base.model';
 
 export class RegisterUserDto {
   @IsOptional()
