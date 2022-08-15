@@ -1,13 +1,17 @@
 import {
   BadRequestException,
+  forwardRef,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
+  Logger,
 } from '@nestjs/common';
 import { prop, ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { ID } from 'src/global/interfaces/id.interface';
 import { PaginateResponse } from 'src/global/interfaces/paginate.interface';
+import { MiningService } from 'src/mining/mining.service';
 import { CreateNftDto } from './dtos/create-nft.dto';
 import { QueryNftDto } from './dtos/query-nft.dto';
 import { UpdateNftDto } from './dtos/update-nft-dto';
@@ -15,8 +19,11 @@ import { NFT } from './schema/nft.schema';
 
 @Injectable()
 export class NftService {
+  private readonly logger = new Logger(NftService.name);
   constructor(
     @InjectModel(NFT) private readonly model: ReturnModelType<typeof NFT>,
+    @Inject(forwardRef(() => MiningService))
+    private readonly miningService: MiningService,
   ) {}
 
   get = async (query: QueryNftDto): Promise<PaginateResponse<NFT>> => {
@@ -126,11 +133,25 @@ export class NftService {
   };
 
   update = async (id: ID, nft: UpdateNftDto): Promise<NFT> => {
-    return await this.model
-      .findByIdAndUpdate(id, nft, { new: true })
-      .populate('creator')
-      .populate('owner')
-      .populate('collectionNft');
+    try {
+      const Mining = await this.miningService.getByLevel(nft.level - 1);
+      if (!Mining) {
+        throw new HttpException('Nft not fount !', HttpStatus.BAD_REQUEST);
+      }
+      if (Mining) {
+        nft.price = Mining.price * Mining.multiplier;
+      }
+      const updatedNft = await this.model
+        .findByIdAndUpdate(id, nft, { new: true })
+        .populate('creator')
+        .populate('owner')
+        .populate('collectionNft');
+      this.logger.log(`updated a nft by id#${updatedNft?._id}`);
+      return updatedNft;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
   };
 
   delete = async (id: ID): Promise<NFT> => {
