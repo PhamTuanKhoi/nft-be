@@ -40,6 +40,13 @@ export class UserService {
   async findAll(query: QueryUserDto): Promise<PaginateResponse<User>> {
     let tmp: any = [
       {
+        $match: {
+          role: {
+            $ne: UserRoleEnum.ADMIN,
+          },
+        },
+      },
+      {
         $lookup: {
           from: 'winers',
           localField: '_id',
