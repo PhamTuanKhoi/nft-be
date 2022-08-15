@@ -11,6 +11,9 @@ export class Badges {
   @prop()
   description: string;
 
+  @prop()
+  scores: number;
+
   // @prop({ ref: () => User, required: true })
   // owner: Ref<User>;
 }
