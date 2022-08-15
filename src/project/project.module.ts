@@ -6,8 +6,11 @@ import { Project } from './schema/project.schema';
 import { ProblemCategoryModule } from 'src/problem-category/problem-category.module';
 import { UserService } from 'src/user/user.service';
 @Module({
-  imports: [TypegooseModule.forFeature([Project]), forwardRef(() => ProblemCategoryModule),],
+  imports: [
+    TypegooseModule.forFeature([Project]),
+    forwardRef(() => ProblemCategoryModule),
+  ],
   controllers: [ProjectController],
-  providers: [ProjectService]
+  providers: [ProjectService],
 })
 export class ProjectModule {}
