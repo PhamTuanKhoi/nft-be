@@ -25,6 +25,11 @@ export class WinerController {
     return this.winerService.findAll();
   }
 
+  @Get('user/:id')
+  findByUser(@Param('id') id: string) {
+    return this.winerService.findByUser(id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.winerService.findOne(+id);

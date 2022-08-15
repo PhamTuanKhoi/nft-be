@@ -40,6 +40,13 @@ export class UserService {
   async findAll(query: QueryUserDto): Promise<PaginateResponse<User>> {
     let tmp: any = [
       {
+        $match: {
+          role: {
+            $ne: UserRoleEnum.ADMIN,
+          },
+        },
+      },
+      {
         $lookup: {
           from: 'winers',
           localField: '_id',
@@ -222,7 +229,7 @@ export class UserService {
   }
   async findByAddress(address: string) {
     return this.model.findOne({
-      address: address.toUpperCase(),
+      address: address,
     });
   }
 
@@ -254,11 +261,10 @@ export class UserService {
 
   async createByAddress(address: string) {
     return this.model.create({
-      address: address.toUpperCase(),
+      address: address,
       username: address,
       password: Date.now().toString(),
       email: '',
-      title: 'admin',
       status: UserStatusEnum.ACTIVE,
       avatar: '',
       cover: '',
@@ -267,7 +273,7 @@ export class UserService {
     });
   }
 
-  async update(id, user) {
+  async update(id: ID, user) {
     try {
       const updatedUser = await this.model.findByIdAndUpdate(id, user, {
         new: true,
