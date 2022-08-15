@@ -22,6 +22,9 @@ export class User extends BaseModel {
   email: string;
 
   @prop()
+  emailOld: string;
+
+  @prop()
   title: string;
 
   @prop({ default: 'Unnamed' })

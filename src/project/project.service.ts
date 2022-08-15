@@ -69,6 +69,7 @@ export class ProjectService {
   }
   async get(query: QueryProjectDto) {
     const { page, limit, sortType, sortBy, ...filterQuery } = query;
+    console.log(query);
 
     let pipeline: any = [
       {
@@ -80,6 +81,9 @@ export class ProjectService {
         },
       },
       {
+        $unwind: '$problem',
+      },
+      {
         $lookup: {
           from: 'users',
           localField: 'likes',
@@ -89,6 +93,18 @@ export class ProjectService {
       },
     ];
 
+    if (filterQuery.problem) {
+      pipeline = [
+        ...pipeline,
+        {
+          $match: {
+            $expr: {
+              $eq: ['$problem._id', { $toObjectId: filterQuery.problem }],
+            },
+          },
+        },
+      ];
+    }
     if (filterQuery.status !== undefined) {
       pipeline.push({
         $match: {
