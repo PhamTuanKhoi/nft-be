@@ -96,6 +96,15 @@ export class BadgesService {
     }
   }
 
+  async findScores(power: number) {
+    try {
+      return await this.model.find({ scores: { $lte: power } });
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   async isModelExist(id, isOptional = false, msg = '') {
     if (isOptional && !id) return;
     const errorMessage = msg || `id-> ${Badges.name} not found`;

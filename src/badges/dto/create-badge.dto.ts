@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateBadgeDto {
   @IsOptional()
@@ -13,7 +13,7 @@ export class CreateBadgeDto {
   @IsString()
   description: string;
 
-  // @IsNotEmpty()
-  // // @IsString()
-  // owner: string;
+  @IsOptional()
+  @IsNumber()
+  scores: number;
 }
