@@ -69,7 +69,6 @@ export class ProjectService {
   }
   async get(query: QueryProjectDto) {
     const { page, limit, sortType, sortBy, ...filterQuery } = query;
-    console.log(query);
 
     let pipeline: any = [
       {
