@@ -131,6 +131,14 @@ export class UserService {
             as: 'projects',
           },
         },
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: '_id',
+            foreignField: 'owner',
+            as: 'Mined',
+          },
+        },
       ]);
     } catch (error) {
       this.logger.error(error?.message, error.stack);
