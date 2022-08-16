@@ -87,6 +87,17 @@ export class ProjectService {
           from: 'users',
           localField: 'likes',
           foreignField: '_id',
+          pipeline: [
+            {
+              $lookup: {
+                from: 'nfts',
+                localField: '_id',
+                foreignField: 'owner',
+                as: 'nfts',
+              },
+            },
+            // { $unwind: '$nfts' },
+          ],
           as: 'users',
         },
       },
