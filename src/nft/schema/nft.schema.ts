@@ -34,4 +34,7 @@ export class NFT {
 
   @prop({ default: 0 })
   endTime: number;
+
+  @prop({ default: 0 })
+  price: number;
 }
