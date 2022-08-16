@@ -5,7 +5,7 @@ export class CreateWinerDto {
   @IsString()
   user: string;
 
-  @IsNotEmpty()
-  @IsString()
-  badges: string;
+  // @IsNotEmpty()
+  // @IsString()
+  // badges: string;
 }

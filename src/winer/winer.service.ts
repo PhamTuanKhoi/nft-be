@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   forwardRef,
+  HttpException,
+  HttpStatus,
   Inject,
   Injectable,
   Logger,
@@ -28,11 +30,47 @@ export class WinerService {
 
   async create(createWinerDto: CreateWinerDto) {
     try {
-      await this.userService.isModelExist(createWinerDto.user);
-      await this.badgesService.isModelExist(createWinerDto.badges);
-      const createdWiner = await this.model.create(createWinerDto);
-      this.logger.log(`created a new winer by id#${createdWiner?._id}`);
-      return createdWiner;
+      const isUser = await this.userService.findOwner(createWinerDto.user);
+      if (!isUser) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
+      const isBadges = await this.badgesService.findScores(isUser.power);
+      let payload = [];
+      let wined = [];
+      if (isBadges.length > 0) {
+        isBadges.map((item) => {
+          this.model
+            .find({ badges: item._id, user: createWinerDto.user })
+            .then((isWiner) => {
+              if (isWiner.length > 0) {
+                return false;
+              } else {
+                this.model
+                  .create({
+                    user: createWinerDto.user,
+                    badges: item._id,
+                  })
+                  .then((data) => {
+                    this.logger.log(`created a new winer by id#${data._id}`);
+                    return data;
+                  });
+              }
+            });
+        });
+      } else {
+        this.logger.log(`you not enough power`);
+        return true;
+      }
+      // console.log('bad', isBadges);
+      // payload.push({
+      //   user: createWinerDto.user,
+      //   badges: item._id,
+      // });
+      // const createdWiner = [];
+      // const createdWiner = await this.model.insertMany(payload);
+      // this.logger.log(`created a new winer`);
+      // console.log(createdWiner);
+      // return createdWiner;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);
