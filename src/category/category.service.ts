@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { ID } from 'src/global/interfaces/id.interface';
@@ -10,6 +10,7 @@ import { Category } from './schema/category.schema';
 
 @Injectable()
 export class CategoryService {
+  private readonly logger = new Logger(CategoryService.name);
   constructor(
     @InjectModel(Category)
     private readonly model: ReturnModelType<typeof Category>,
@@ -88,10 +89,16 @@ export class CategoryService {
   };
 
   update = async (id: ID, nft: UpdateCategoryDto): Promise<Category> => {
-    return await this.model
-      .findByIdAndUpdate(id, nft, { new: true })
-      .populate('user')
-      .populate('nft');
+    try {
+      const updated = await this.model.findByIdAndUpdate(id, nft, {
+        new: true,
+      });
+      this.logger.log(`created a new category by id#${updated?._id}`);
+      return updated;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
   };
 
   delete = async (id: ID): Promise<Category> => {
