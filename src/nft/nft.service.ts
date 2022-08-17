@@ -37,6 +37,17 @@ export class NftService {
         },
       },
     ];
+
+    if (query.level !== undefined) {
+      tmp = [
+        ...tmp,
+        {
+          $match: {
+            level: query.level,
+          },
+        },
+      ];
+    }
     if (query.search !== undefined && query.search.length > 0) {
       tmp = [
         ...tmp,
