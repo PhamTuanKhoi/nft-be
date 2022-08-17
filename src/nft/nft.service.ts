@@ -37,8 +37,7 @@ export class NftService {
         },
       },
     ];
-
-    if (query.level !== undefined) {
+    if (query.level) {
       tmp = [
         ...tmp,
         {
