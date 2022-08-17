@@ -16,7 +16,24 @@ export class HistoryService {
   ) {}
 
   get = async (query: QueryHistoryDto): Promise<PaginateResponse<History>> => {
-    let tmp = [];
+    let tmp: any = [
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'users',
+        },
+      },
+      {
+        $lookup: {
+          from: 'nfts',
+          localField: 'nft',
+          foreignField: '_id',
+          as: 'nfts',
+        },
+      },
+    ];
     if (query.search !== undefined && query.search.length > 0) {
       tmp = [
         ...tmp,
