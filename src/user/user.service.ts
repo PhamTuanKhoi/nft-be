@@ -145,13 +145,13 @@ export class UserService {
       throw new BadRequestException(error?.message);
     }
   }
+
   async isUpdatePower(id, payload) {
     const data = await this.findOne(id);
     if (!data) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
     let isPower = data?.power + payload?.isPower;
-    console.log(data?.power, payload?.isPower, isPower);
     const updatedPower = await this.model.findByIdAndUpdate(
       id,
       { power: isPower },
@@ -164,7 +164,6 @@ export class UserService {
   async updatePower(id: string, nft: string) {
     try {
       const isNft = await this.nftService.findOne(nft);
-      console.log(isNft.level);
       if (!isNft) {
         throw new HttpException('Nft not found', HttpStatus.NOT_FOUND);
       }
