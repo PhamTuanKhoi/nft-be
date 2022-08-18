@@ -47,4 +47,8 @@ export class UpdateNftDto extends BaseModel {
   @IsOptional()
   @IsNumber()
   price: number;
+
+  @IsOptional()
+  @IsNumber()
+  total: number;
 }

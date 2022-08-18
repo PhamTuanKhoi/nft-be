@@ -83,7 +83,7 @@ export class CollectionService {
 
   async ranking() {
     try {
-      return await this.model.aggregate([
+      const result = await this.model.aggregate([
         {
           $lookup: {
             from: 'nfts',
@@ -91,11 +91,6 @@ export class CollectionService {
             foreignField: '_id',
             pipeline: [
               { $sort: { price: -1 } },
-              {
-                $addFields: {
-                  total: { $sum: '$price' },
-                },
-              },
               {
                 $lookup: {
                   from: 'users',
@@ -105,22 +100,118 @@ export class CollectionService {
                   as: 'owners',
                 },
               },
+              {
+                $unwind: '$owners',
+              },
             ],
             as: 'nfts',
           },
         },
         {
-          $lookup: {
-            from: 'categories',
-            localField: 'category',
-            foreignField: '_id',
-            as: 'category',
+          $project: {
+            name: '$name',
+            image: '$image',
+            nfts: '$nfts',
           },
         },
         {
-          $unwind: '$category',
+          $unwind: '$nfts',
+        },
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+              nameCollection: '$name',
+              imageCollection: '$image',
+              // owners: '$nfts.owners',
+            },
+            total: {
+              $sum: '$nfts.total',
+            },
+            maxPower: {
+              $max: '$nfts.owners.power',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            collectionId: '$_id.id',
+            nameCollection: '$_id.nameCollection',
+            imageCollection: '$_id.imageCollection',
+            total: '$total',
+            maxPower: '$maxPower',
+          },
         },
       ]);
+      const data = await this.model.aggregate([
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: 'nfts',
+            foreignField: '_id',
+            pipeline: [
+              { $sort: { price: -1 } },
+              {
+                $lookup: {
+                  from: 'users',
+                  localField: 'owner',
+                  foreignField: '_id',
+                  pipeline: [{ $sort: { power: -1 } }],
+                  as: 'owners',
+                },
+              },
+              {
+                $unwind: '$owners',
+              },
+            ],
+            as: 'nfts',
+          },
+        },
+        {
+          $project: {
+            nfts: '$nfts',
+          },
+        },
+        {
+          $unwind: '$nfts',
+        },
+        {
+          $project: {
+            ownerId: '$nfts.owners._id',
+            avatar: '$nfts.owners.avatar',
+            power: '$nfts.owners.power',
+          },
+        },
+        {
+          $group: {
+            _id: {
+              conllectionId: '$_id',
+              ownerId: '$ownerId',
+              avatar: '$avatar',
+              power: '$power',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            id: '$_id.conllectionId',
+            ownerId: '$_id.ownerId',
+            avatar: '$_id.avatar',
+            power: '$_id.power',
+          },
+        },
+        {
+          $sort: {
+            power: -1,
+          },
+        },
+      ]);
+      return {
+        compare: result,
+        owners: data,
+      };
     } catch (error) {
       // this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);
