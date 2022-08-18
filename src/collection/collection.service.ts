@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { ID } from 'src/global/interfaces/id.interface';
@@ -80,6 +80,52 @@ export class CollectionService {
   getById = async (id: ID): Promise<Collection> => {
     return await this.model.findById(id).populate('nfts').populate('creator');
   };
+
+  async ranking() {
+    try {
+      return await this.model.aggregate([
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: 'nfts',
+            foreignField: '_id',
+            pipeline: [
+              { $sort: { price: -1 } },
+              {
+                $addFields: {
+                  total: { $sum: '$price' },
+                },
+              },
+              {
+                $lookup: {
+                  from: 'users',
+                  localField: 'owner',
+                  foreignField: '_id',
+                  pipeline: [{ $sort: { price: -1 } }],
+                  as: 'owners',
+                },
+              },
+            ],
+            as: 'nfts',
+          },
+        },
+        {
+          $lookup: {
+            from: 'categories',
+            localField: 'category',
+            foreignField: '_id',
+            as: 'category',
+          },
+        },
+        {
+          $unwind: '$category',
+        },
+      ]);
+    } catch (error) {
+      // this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
 
   getAll = async (): Promise<any> => {
     return await this.model.find().populate('nfts').populate('creator');
