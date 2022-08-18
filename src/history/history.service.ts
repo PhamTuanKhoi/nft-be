@@ -34,6 +34,18 @@ export class HistoryService {
         },
       },
     ];
+    if (query.nft) {
+      tmp = [
+        {
+          $match: {
+            $expr: {
+              $eq: ['$nft', { $toObjectId: query.nft }],
+            },
+          },
+        },
+        ...tmp,
+      ];
+    }
     if (query.search !== undefined && query.search.length > 0) {
       tmp = [
         ...tmp,
