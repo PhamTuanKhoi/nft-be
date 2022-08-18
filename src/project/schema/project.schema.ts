@@ -1,4 +1,5 @@
 import { prop, Ref } from '@typegoose/typegoose';
+import { BaseModel } from 'src/global/base.model';
 import { ProblemCategory } from 'src/problem-category/schema/problem-category.schema';
 import { User } from 'src/user/schemas/user.schema';
 
@@ -7,7 +8,7 @@ export enum ProjectStatusEnum {
   Mined = 1,
   Waiting = 2,
 }
-export class Project {
+export class Project extends BaseModel {
   @prop()
   name: string;
 
