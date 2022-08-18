@@ -1,7 +1,8 @@
 import { Prop } from '@typegoose/typegoose';
 import { Type } from 'class-transformer';
+import { BaseModel } from 'src/global/base.model';
 
-export class Mining {
+export class Mining extends BaseModel {
   @Prop({ required: true })
   @Type(() => Number)
   level: number;

@@ -2,8 +2,9 @@ import { Category } from './../../category/schema/category.schema';
 import { prop, Ref } from '@typegoose/typegoose';
 import { NFT } from 'src/nft/schema/nft.schema';
 import { User } from 'src/user/schemas/user.schema';
+import { BaseModel } from 'src/global/base.model';
 
-export class Collection {
+export class Collection extends BaseModel {
   @prop({ required: true })
   name: string;
 
