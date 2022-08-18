@@ -8,6 +8,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { prop, ReturnModelType } from '@typegoose/typegoose';
+import { Console } from 'console';
 import { InjectModel } from 'nestjs-typegoose';
 import { ID } from 'src/global/interfaces/id.interface';
 import { PaginateResponse } from 'src/global/interfaces/paginate.interface';
@@ -144,13 +145,23 @@ export class NftService {
 
   update = async (id: ID, nft: UpdateNftDto): Promise<NFT> => {
     try {
-      const Mining = await this.miningService.getByLevel(nft.level - 1);
-      if (!Mining) {
+      let priced = 0;
+      const isNft = await this.getById(id);
+      if (!isNft) {
         throw new HttpException('Nft not fount !', HttpStatus.BAD_REQUEST);
       }
+      const Mining = await this.miningService.getByLevel(nft.level - 1);
+      if (!Mining) {
+        throw new HttpException('Mining not fount !', HttpStatus.BAD_REQUEST);
+      }
       if (Mining) {
+        priced = Mining.price * Mining.multiplier;
         nft.price = Mining.price * Mining.multiplier;
       }
+      if (isNft) {
+        nft.total = isNft.price + priced;
+      }
+      console.log(isNft.price, priced);
       const updatedNft = await this.model
         .findByIdAndUpdate(id, nft, { new: true })
         .populate('creator')

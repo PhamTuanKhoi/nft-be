@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { ID } from 'src/global/interfaces/id.interface';
@@ -80,6 +80,143 @@ export class CollectionService {
   getById = async (id: ID): Promise<Collection> => {
     return await this.model.findById(id).populate('nfts').populate('creator');
   };
+
+  async ranking() {
+    try {
+      const result = await this.model.aggregate([
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: 'nfts',
+            foreignField: '_id',
+            pipeline: [
+              { $sort: { price: -1 } },
+              {
+                $lookup: {
+                  from: 'users',
+                  localField: 'owner',
+                  foreignField: '_id',
+                  pipeline: [{ $sort: { price: -1 } }],
+                  as: 'owners',
+                },
+              },
+              {
+                $unwind: '$owners',
+              },
+            ],
+            as: 'nfts',
+          },
+        },
+        {
+          $project: {
+            name: '$name',
+            image: '$image',
+            nfts: '$nfts',
+          },
+        },
+        {
+          $unwind: '$nfts',
+        },
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+              nameCollection: '$name',
+              imageCollection: '$image',
+              // owners: '$nfts.owners',
+            },
+            total: {
+              $sum: '$nfts.total',
+            },
+            maxPower: {
+              $max: '$nfts.owners.power',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            collectionId: '$_id.id',
+            nameCollection: '$_id.nameCollection',
+            imageCollection: '$_id.imageCollection',
+            total: '$total',
+            maxPower: '$maxPower',
+          },
+        },
+      ]);
+      const data = await this.model.aggregate([
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: 'nfts',
+            foreignField: '_id',
+            pipeline: [
+              { $sort: { price: -1 } },
+              {
+                $lookup: {
+                  from: 'users',
+                  localField: 'owner',
+                  foreignField: '_id',
+                  pipeline: [{ $sort: { power: -1 } }],
+                  as: 'owners',
+                },
+              },
+              {
+                $unwind: '$owners',
+              },
+            ],
+            as: 'nfts',
+          },
+        },
+        {
+          $project: {
+            nfts: '$nfts',
+          },
+        },
+        {
+          $unwind: '$nfts',
+        },
+        {
+          $project: {
+            ownerId: '$nfts.owners._id',
+            avatar: '$nfts.owners.avatar',
+            power: '$nfts.owners.power',
+          },
+        },
+        {
+          $group: {
+            _id: {
+              conllectionId: '$_id',
+              ownerId: '$ownerId',
+              avatar: '$avatar',
+              power: '$power',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            id: '$_id.conllectionId',
+            ownerId: '$_id.ownerId',
+            avatar: '$_id.avatar',
+            power: '$_id.power',
+          },
+        },
+        {
+          $sort: {
+            power: -1,
+          },
+        },
+      ]);
+      return {
+        compare: result,
+        owners: data,
+      };
+    } catch (error) {
+      // this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
 
   getAll = async (): Promise<any> => {
     return await this.model.find().populate('nfts').populate('creator');
