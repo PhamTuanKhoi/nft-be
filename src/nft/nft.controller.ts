@@ -25,7 +25,6 @@ export class NftController {
   async getAll() {
     return await this.service.getAll();
   }
-
   // GET: /v1/nfts/
   // get all nft with query
   @Get()
@@ -33,7 +32,11 @@ export class NftController {
     return await this.service.get(query);
   }
 
-    // GET: /v1/nfts/:id
+  @Get('viewer/:id')
+  async viewer(@Param('id') id: ID) {
+    return this.service.viewer(id);
+  }
+  // GET: /v1/nfts/:id
   // get nft by id
   @Get(':id')
   async getById(@Param('id') id: ID) {
@@ -45,6 +48,7 @@ export class NftController {
   async create(@Body() nft: CreateNftDto) {
     return this.service.create(nft);
   }
+
   // PATCH: /v1/nfts/:id
   // uppdate nft by id
   @Patch(':id')
