@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { ID } from 'src/global/interfaces/id.interface';
@@ -10,6 +10,7 @@ import { Collection } from './schema/collection.schema';
 
 @Injectable()
 export class CollectionService {
+  private readonly logger = new Logger(CollectionService.name);
   constructor(
     @InjectModel(Collection)
     private readonly model: ReturnModelType<typeof Collection>,
@@ -196,7 +197,7 @@ export class CollectionService {
         {
           $project: {
             _id: 0,
-            id: '$_id.conllectionId',
+            idColl: '$_id.conllectionId',
             ownerId: '$_id.ownerId',
             avatar: '$_id.avatar',
             power: '$_id.power',
@@ -204,16 +205,38 @@ export class CollectionService {
         },
         {
           $sort: {
+            collectionId: -1,
             power: -1,
           },
         },
       ]);
+      // data.filter(
+      //   function (el) {
+      //     return this.has(el.Id);
+      //   },
+      //   new Set(
+      //     result.map((res) => {
+      //       if (res.Id === el.Id) {
+
+      //       }
+      //     }),
+      //   ),
+      // );
+      // return a;
+
+      // result.filter(function (o) {
+      //   return data.some(function (o2) {
+      //     if (o.Id === o2.Id) {
+      //       result.push(o2);
+      //     }
+      //   });
+      // });
       return {
         compare: result,
         owners: data,
       };
     } catch (error) {
-      // this.logger.error(error?.message, error.stack);
+      this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);
     }
   }
