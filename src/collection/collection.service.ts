@@ -3,6 +3,7 @@ import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { ID } from 'src/global/interfaces/id.interface';
 import { PaginateResponse } from 'src/global/interfaces/paginate.interface';
+import { UserRoleEnum } from 'src/user/interfaces/userRole.enum';
 import { CreateCollectionDto } from './dtos/create-collection.dto';
 import { QueryCollectionDto } from './dtos/query-collection.dto';
 import { UpdateCollectionDto } from './dtos/update-collection.dto';
@@ -176,6 +177,13 @@ export class CollectionService {
         },
         {
           $unwind: '$nfts',
+        },
+        {
+          $match: {
+            'nfts.owners.role': {
+              $ne: UserRoleEnum.ADMIN,
+            },
+          },
         },
         {
           $project: {

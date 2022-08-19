@@ -34,6 +34,11 @@ export class UserController {
     return await this.service.findAll(query);
   }
 
+  @Get('ranking')
+  async ranking() {
+    return await this.service.ranking();
+  }
+
   @Get('power/:id/:nft')
   async updatePower(@Param('id') id: string, @Param('nft') nft: string) {
     return await this.service.updatePower(id, nft);
