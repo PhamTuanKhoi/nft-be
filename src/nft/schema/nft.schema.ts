@@ -1,7 +1,8 @@
 import { pre, prop, Ref } from '@typegoose/typegoose';
 import { Collection } from 'src/collection/schema/collection.schema';
+import { BaseModel } from 'src/global/base.model';
 import { User } from 'src/user/schemas/user.schema';
-export class NFT {
+export class NFT extends BaseModel {
   @prop({ required: true })
   name: string;
 
@@ -37,4 +38,7 @@ export class NFT {
 
   @prop({ default: 0 })
   price: number;
+
+  @prop({ default: 0 })
+  total: number;
 }

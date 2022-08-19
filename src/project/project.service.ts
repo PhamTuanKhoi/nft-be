@@ -158,6 +158,7 @@ export class ProjectService {
       },
     };
   }
+
   findAll() {
     try {
       return this.model.find();

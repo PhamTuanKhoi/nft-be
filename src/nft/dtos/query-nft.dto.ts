@@ -11,4 +11,9 @@ export class QueryNftDto extends QueryDto {
   @IsOptional()
   @IsString()
   endTime: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  level: Number;
 }

@@ -1,7 +1,8 @@
 import { Prop } from '@typegoose/typegoose';
 import { Type } from 'class-transformer';
+import { BaseModel } from 'src/global/base.model';
 
-export class Category {
+export class Category extends BaseModel {
   @Prop({ required: true })
   @Type(() => String)
   title: string;

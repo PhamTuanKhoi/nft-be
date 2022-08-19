@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -6,7 +15,7 @@ import { QueryProjectDto } from './dto/query-paging.dto';
 
 @Controller('projects')
 export class ProjectController {
-  constructor(private readonly projectService: ProjectService) { }
+  constructor(private readonly projectService: ProjectService) {}
 
   @Post('/likeProject/:id/:idNft')
   async likeProject(@Param('id') id: string, @Param('idNft') idNft: string) {
@@ -21,6 +30,7 @@ export class ProjectController {
   async get(@Query() query: QueryProjectDto) {
     return await this.projectService.get(query);
   }
+
   @Get()
   findAll() {
     return this.projectService.findAll();
