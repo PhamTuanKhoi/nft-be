@@ -14,6 +14,7 @@ import { InjectModel } from 'nestjs-typegoose';
 import { ResetPasswordDto } from '../user/dtos/reset-password.dto';
 import { ConfigService } from '@nestjs/config';
 import { UpdateUserDto } from 'src/user/dtos/update-user.dto';
+import { CreateUserDto } from 'src/user/dtos/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -76,7 +77,7 @@ export class AuthService {
     };
   }
 
-  async register(registerUser: RegisterUserDto) {
+  async register(registerUser: CreateUserDto) {
     return this.usersService.create(registerUser);
   }
 
