@@ -143,6 +143,26 @@ export class NftService {
     return await this.model.create(nft);
   };
 
+  async viewer(id: ID) {
+    try {
+      let view = 0;
+      const isNft = await this.getById(id);
+      if (!isNft) {
+        throw new HttpException('Nft not fount !', HttpStatus.BAD_REQUEST);
+      }
+      if (isNft) {
+        view = isNft.viewer + 1;
+      }
+      const updatedViewer = await this.model.findByIdAndUpdate(id, {
+        viewer: view,
+      });
+      return updatedViewer;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   update = async (id: ID, nft: UpdateNftDto): Promise<NFT> => {
     try {
       let priced = 0;
@@ -161,7 +181,6 @@ export class NftService {
       if (isNft) {
         nft.total = isNft.price + priced;
       }
-      console.log(isNft.price, priced);
       const updatedNft = await this.model
         .findByIdAndUpdate(id, nft, { new: true })
         .populate('creator')

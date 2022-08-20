@@ -113,6 +113,66 @@ export class UserService {
     };
   }
 
+  async ranking() {
+    try {
+      const result = await this.model.aggregate([
+        {
+          $match: {
+            role: {
+              $ne: UserRoleEnum.ADMIN,
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'winers',
+            localField: '_id',
+            foreignField: 'user',
+            pipeline: [
+              {
+                $lookup: {
+                  from: 'badges',
+                  localField: 'badges',
+                  foreignField: '_id',
+                  as: 'badges',
+                },
+              },
+              { $unwind: '$badges' },
+              { $sort: { 'badges.scores': -1 } },
+            ],
+            as: 'winers',
+          },
+        },
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+              avatar: '$avatar',
+              name: '$displayName',
+              power: '$power',
+              winers: '$winers',
+            },
+          },
+        },
+        { $sort: { '_id.power': -1 } },
+        {
+          $project: {
+            _id: 0,
+            id: '$_id.id',
+            avatar: '$_id.avatar',
+            name: '$_id.name',
+            power: '$_id.power',
+            winers: '$_id.winers',
+          },
+        },
+      ]);
+      return result;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   async getUserLikes(id) {
     try {
       return await this.model.aggregate([
