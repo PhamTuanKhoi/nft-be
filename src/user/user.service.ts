@@ -24,6 +24,7 @@ import { UserRoleEnum } from './interfaces/userRole.enum';
 import { ProjectService } from 'src/project/project.service';
 import { NftService } from 'src/nft/nft.service';
 import { MiningService } from 'src/mining/mining.service';
+import { CreateUserDto } from './dtos/create-user.dto';
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserService.name);
@@ -263,17 +264,28 @@ export class UserService {
     return await this.model.findOne({ username }).exec();
   }
 
-  async create(registerUser: RegisterUserDto): Promise<User> {
-    const user = await this.model.findOne({ username: registerUser.username });
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const user = await this.model.findOne({ username: createUserDto.username });
 
     if (user)
       throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
 
-    const newUser = new this.model(registerUser);
-    newUser.password = await bcrypt.hash(registerUser.password, 10);
+    const IsEmail = await this.model.findOne({ email: createUserDto.email });
+
+    if (IsEmail) {
+      throw new HttpException('Email already exists', HttpStatus.BAD_REQUEST);
+    }
+
+    const isAddress = await this.findByAddress(createUserDto.address);
+
+    if (isAddress) {
+      throw new HttpException('Address already exists', HttpStatus.BAD_REQUEST);
+    }
+
+    const newUser = new this.model(createUserDto);
 
     const created = await newUser.save();
-    return this.findOne(created.id);
+    return this.findOne(created._id);
   }
 
   async remove(id: ID): Promise<User> {
