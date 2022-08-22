@@ -2,10 +2,16 @@ import { Prop } from '@typegoose/typegoose';
 import { Type } from 'class-transformer';
 import { BaseModel } from 'src/global/base.model';
 
+export enum CategoryNameEnum {
+  Art = 'Art',
+  Music = 'Music',
+  Collectibles = 'Collectibles',
+  Sports = 'Sports',
+}
 export class Category extends BaseModel {
-  @Prop({ required: true })
-  @Type(() => String)
-  title: string;
+  // @Prop({ required: true })
+  // @Type(() => String)
+  // title: string;
 
   @Prop()
   image: string;
@@ -24,4 +30,7 @@ export class Category extends BaseModel {
 
   @Prop()
   size: string;
+
+  @Prop()
+  name: CategoryNameEnum;
 }
