@@ -51,9 +51,15 @@ export class NftController {
 
   // PATCH: /v1/nfts/:id
   // uppdate nft by id
-  @Patch(':id')
+  @Patch('updated/:id')
   async update(@Param('id') id: ID, @Body() nft: UpdateNftDto) {
     return this.service.update(id, nft);
+  }
+  // PATCH: /v1/nfts/:id
+  // uppdate nft by id
+  @Patch(':id')
+  async updateTotalPrice(@Param('id') id: ID, @Body() nft: UpdateNftDto) {
+    return this.service.updateTotalPrice(id, nft);
   }
   // PATCH: /v1/nfts/:id
   // uppdate nft by id
