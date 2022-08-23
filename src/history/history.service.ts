@@ -19,17 +19,6 @@ export class HistoryService {
     let tmp: any = [
       {
         $lookup: {
-          from: 'users',
-          localField: 'user',
-          foreignField: '_id',
-          as: 'users',
-        },
-      },
-      {
-        $unwind: '$users',
-      },
-      {
-        $lookup: {
           from: 'nfts',
           localField: 'nft',
           foreignField: '_id',
@@ -38,6 +27,17 @@ export class HistoryService {
       },
       {
         $unwind: '$nfts',
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'users',
+        },
+      },
+      {
+        $unwind: '$users',
       },
     ];
     if (query.nft) {
@@ -52,6 +52,17 @@ export class HistoryService {
         ...tmp,
       ];
     }
+    if (query.name) {
+      tmp.push({
+        $match: {
+          'users.displayName': {
+            $regex: '.*' + query.name + '.*',
+            $options: 'i',
+          },
+        },
+      });
+    }
+
     if (query.search !== undefined && query.search.length > 0) {
       tmp = [
         ...tmp,

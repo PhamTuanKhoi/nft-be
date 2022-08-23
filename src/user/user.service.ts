@@ -174,6 +174,66 @@ export class UserService {
     }
   }
 
+  async coreteam(id: string) {
+    try {
+      const data = await this.model.aggregate([
+        {
+          $match: {
+            $expr: {
+              $eq: ['$_id', { $toObjectId: id }],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: '_id',
+            foreignField: 'owner',
+            pipeline: [
+              {
+                $lookup: {
+                  from: 'collections',
+                  localField: 'collectionNft',
+                  foreignField: '_id',
+                  as: 'collections',
+                },
+              },
+            ],
+            as: 'nfts',
+          },
+        },
+        {
+          $unwind: '$nfts',
+        },
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+              name: '$displayName',
+              avatar: '$avatar',
+              power: '$power',
+              collections: '$nfts.collections',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            idMe: '$_id.id',
+            name: '$_id.name',
+            avatar: '$_id.avatar',
+            power: '$_id.power',
+            collections: '$_id.collections',
+          },
+        },
+      ]);
+      return data;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   async getUserLikes(id) {
     try {
       return await this.model.aggregate([
