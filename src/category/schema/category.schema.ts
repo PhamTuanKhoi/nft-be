@@ -9,9 +9,8 @@ export enum CategoryNameEnum {
   Sports = 'Sports',
 }
 export class Category extends BaseModel {
-  // @Prop({ required: true })
-  // @Type(() => String)
-  // title: string;
+  @Prop({ required: true })
+  title: CategoryNameEnum;
 
   @Prop()
   image: string;
@@ -31,6 +30,6 @@ export class Category extends BaseModel {
   @Prop()
   size: string;
 
-  @Prop()
-  name: CategoryNameEnum;
+  // @Prop()
+  // name: CategoryNameEnum;
 }
