@@ -5,4 +5,8 @@ export class QueryHistoryDto extends QueryDto {
   @IsOptional()
   @IsString()
   nft: string;
+
+  @IsOptional()
+  @IsString()
+  name: string;
 }
