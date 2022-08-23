@@ -46,6 +46,11 @@ export class UserController {
     return await this.service.updatePower(id, nft);
   }
 
+  @Get('coreteam/:id')
+  async coreteam(@Param('id') id: string) {
+    return await this.service.coreteam(id);
+  }
+
   @Get('likes/:id')
   async getUserLikes(@Param('id') id: string) {
     return await this.service.getUserLikes(id);
