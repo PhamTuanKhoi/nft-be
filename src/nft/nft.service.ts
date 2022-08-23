@@ -245,6 +245,21 @@ export class NftService {
 
   update = async (id: ID, nft: UpdateNftDto): Promise<NFT> => {
     try {
+      const updatedNft = await this.model
+        .findByIdAndUpdate(id, nft, { new: true })
+        .populate('creator')
+        .populate('owner')
+        .populate('collectionNft');
+      this.logger.log(`updated a nft by id#${updatedNft?._id}`);
+      return updatedNft;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  };
+
+  updateTotalPrice = async (id: ID, nft: UpdateNftDto): Promise<NFT> => {
+    try {
       let priced = 0;
       const isNft = await this.getById(id);
       if (!isNft) {
@@ -266,7 +281,7 @@ export class NftService {
         .populate('creator')
         .populate('owner')
         .populate('collectionNft');
-      this.logger.log(`updated a nft by id#${updatedNft?._id}`);
+      this.logger.log(`updated total price a nft by id#${updatedNft?._id}`);
       return updatedNft;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
