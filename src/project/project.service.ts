@@ -102,6 +102,7 @@ export class ProjectService {
         },
       },
     ];
+
     if (filterQuery.problem) {
       pipeline = [
         ...pipeline,

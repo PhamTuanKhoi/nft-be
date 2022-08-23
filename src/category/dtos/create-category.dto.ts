@@ -1,9 +1,11 @@
-import { IsNumber, IsOptional } from 'class-validator';
+import { CategoryNameEnum } from './../schema/category.schema';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 import { BaseModel } from 'src/global/base.model';
 
 export class CreateCategoryDto extends BaseModel {
   @IsOptional()
-  title: string;
+  @IsEnum(CategoryNameEnum)
+  title: CategoryNameEnum;
 
   @IsOptional()
   image: string;
@@ -24,4 +26,8 @@ export class CreateCategoryDto extends BaseModel {
 
   @IsOptional()
   size: string;
+
+  // @IsNotEmpty()
+  // @IsEnum(CategoryNameEnum)
+  // name: CategoryNameEnum;
 }

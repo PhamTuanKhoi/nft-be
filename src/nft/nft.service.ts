@@ -68,6 +68,71 @@ export class NftService {
         },
       ];
     }
+
+    if (query.status && query.status !== undefined) {
+      let status = JSON.parse(query.status);
+      let or: any = [];
+      if (status.mine === true) {
+        // endTime <= Date.now() && level < 12
+        or = [
+          ...or,
+          {
+            endTime: { $lte: Date.now() },
+            level: { $lt: 12 },
+          },
+        ];
+      }
+      if (status.mining === true) {
+        // endTime >= Date.now() && level < 12
+        or = [
+          ...or,
+          {
+            endTime: { $gte: Date.now() },
+            level: { $lt: 12 },
+          },
+        ];
+      }
+      if (status.mined === true) {
+        // endTime >= Date.now() && level < 12
+        or = [
+          ...or,
+          {
+            level: 12,
+          },
+        ];
+      }
+      if (or.length > 0) {
+        tmp = [
+          ...tmp,
+          {
+            $match: {
+              $or: or,
+            },
+          },
+        ];
+      }
+    }
+
+    if (query.collection && query.collection !== undefined) {
+      let collection = JSON.parse(query.collection);
+      let or = collection.map((item) => {
+        return {
+          $eq: ['$collectionNft', { $toObjectId: item }],
+        };
+      });
+
+      // console.log(or);
+      if (or.length > 0) {
+        tmp = [
+          ...tmp,
+          {
+            $match: {
+              $expr: { $or: or },
+            },
+          },
+        ];
+      }
+    }
     if (
       query.sortBy !== undefined &&
       query.sortBy.length > 0 &&
@@ -91,6 +156,21 @@ export class NftService {
         },
       ];
     }
+
+    // if (query.status) {
+    //   if(query.status === 1){
+    //     tmp = [
+    //       {
+    //         $match: {
+    //           endTime: {
+    //             $gte:
+    //           }
+    //         },
+    //       },
+    //       ...tmp,
+    //     ];
+    //   }
+    // }
 
     let findQuery = this.model.aggregate(tmp);
     const count = (await findQuery.exec()).length;
@@ -143,6 +223,26 @@ export class NftService {
     return await this.model.create(nft);
   };
 
+  async viewer(id: ID) {
+    try {
+      let view = 0;
+      const isNft = await this.getById(id);
+      if (!isNft) {
+        throw new HttpException('Nft not fount !', HttpStatus.BAD_REQUEST);
+      }
+      if (isNft) {
+        view = isNft.viewer + 1;
+      }
+      const updatedViewer = await this.model.findByIdAndUpdate(id, {
+        viewer: view,
+      });
+      return updatedViewer;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   update = async (id: ID, nft: UpdateNftDto): Promise<NFT> => {
     try {
       let priced = 0;
@@ -161,7 +261,6 @@ export class NftService {
       if (isNft) {
         nft.total = isNft.price + priced;
       }
-      console.log(isNft.price, priced);
       const updatedNft = await this.model
         .findByIdAndUpdate(id, nft, { new: true })
         .populate('creator')

@@ -41,4 +41,7 @@ export class NFT extends BaseModel {
 
   @prop({ default: 0 })
   total: number;
+
+  @prop({ default: 0 })
+  viewer: number;
 }

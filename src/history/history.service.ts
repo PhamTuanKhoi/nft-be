@@ -26,12 +26,18 @@ export class HistoryService {
         },
       },
       {
+        $unwind: '$users',
+      },
+      {
         $lookup: {
           from: 'nfts',
           localField: 'nft',
           foreignField: '_id',
           as: 'nfts',
         },
+      },
+      {
+        $unwind: '$nfts',
       },
     ];
     if (query.nft) {

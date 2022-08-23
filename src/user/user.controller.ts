@@ -22,6 +22,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { User } from './schemas/user.schema';
+import { RegisterUserDto } from './dtos/register-user.dto';
+import { CreateUserDto } from './dtos/create-user.dto';
 
 @ApiBearerAuth()
 @ApiTags('USER')
@@ -81,6 +83,11 @@ export class UserController {
   @Post('/nonce')
   async getNonce(@Body() payload: { address: string }) {
     return await this.service.findOrCreateByAddress(payload.address);
+  }
+
+  @Post('')
+  async create(@Body() user: CreateUserDto) {
+    return await this.service.create(user);
   }
 
   @Patch(':id')
