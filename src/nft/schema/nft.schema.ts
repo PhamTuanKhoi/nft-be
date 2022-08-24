@@ -27,8 +27,8 @@ export class NFT extends BaseModel {
   @prop({ default: 1 })
   level: number;
 
-  @prop({ default: 0 })
-  mintCost: number;
+  // @prop({ default: 0 })
+  // mintCost: number;
 
   @prop({ default: false })
   mint: boolean;
