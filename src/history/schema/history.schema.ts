@@ -9,9 +9,9 @@ export class History extends BaseModel {
   @Type(() => Number)
   currentLevel: number;
 
-  @Prop({ required: true })
-  @Type(() => Number)
-  mintCost: number;
+  // @Prop({ required: true })
+  // @Type(() => Number)
+  // mintCost: number;
 
   @Prop({ ref: () => User })
   user: Ref<User>;
