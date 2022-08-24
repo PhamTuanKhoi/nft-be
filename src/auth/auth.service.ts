@@ -131,6 +131,6 @@ export class AuthService {
   }
 
   async updateProfile(id: ID, payload: UpdateUserDto) {
-    return this.usersService.update(id, payload);
+    return this.usersService.updateProfile(id, payload);
   }
 }

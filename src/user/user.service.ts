@@ -424,6 +424,47 @@ export class UserService {
       throw new BadRequestException(error?.message);
     }
   }
+
+  async updateProfile(id: ID, payload: UpdateUserDto) {
+    try {
+      if (payload.email !== payload.emailOld) {
+        const findUserByEmail = await this.model.findOne({
+          email: payload.email,
+        });
+        if (findUserByEmail) {
+          throw new HttpException(
+            'Email already exists',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      }
+      if (
+        payload.password &&
+        payload.confirmPassword &&
+        payload.password !== payload.confirmPassword
+      ) {
+        throw new HttpException(
+          'Confirm password incorrect !',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      if (
+        payload.password &&
+        payload.confirmPassword &&
+        payload.password === payload.confirmPassword
+      ) {
+        payload.password = await bcrypt.hash(payload.password, 10);
+      }
+      const updatedUser = await this.model.findByIdAndUpdate(id, payload, {
+        new: true,
+      });
+      this.logger.log(`updated a power user by id#${updatedUser?._id}`);
+      return updatedUser;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
   // async generateOnceFromAddress(address: string) {
   //   const user = await this.findByAddress(address);
   //   if (user) {
