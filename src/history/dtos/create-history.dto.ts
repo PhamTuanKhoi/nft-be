@@ -9,9 +9,9 @@ export class CreateHistoryDto extends BaseModel {
   @IsNumber()
   currentLevel: number;
 
-  @IsOptional()
-  @IsNumber()
-  mintCost: number;
+  // @IsOptional()
+  // @IsNumber()
+  // mintCost: number;
 
   @IsOptional()
   user: Ref<User>;
