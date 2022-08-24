@@ -10,22 +10,22 @@ export class CreateCategoryDto extends BaseModel {
   @IsOptional()
   image: string;
 
-  @IsOptional()
-  method: string;
+  // @IsOptional()
+  // method: string;
 
-  @IsOptional()
-  @IsNumber()
-  price: number;
+  // @IsOptional()
+  // @IsNumber()
+  // price: number;
 
   @IsOptional()
   description: string;
 
-  @IsOptional()
-  @IsNumber()
-  royalties: number;
+  // @IsOptional()
+  // @IsNumber()
+  // royalties: number;
 
-  @IsOptional()
-  size: string;
+  // @IsOptional()
+  // size: string;
 
   // @IsNotEmpty()
   // @IsEnum(CategoryNameEnum)

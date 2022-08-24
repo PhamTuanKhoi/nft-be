@@ -9,26 +9,26 @@ export enum CategoryNameEnum {
   Sports = 'Sports',
 }
 export class Category extends BaseModel {
-  @Prop({ required: true })
+  @Prop()
   title: CategoryNameEnum;
 
   @Prop()
   image: string;
 
-  @Prop()
-  method: string;
+  // @Prop()
+  // method: string;
 
-  @Prop()
-  price: number;
+  // @Prop()
+  // price: number;
 
   @Prop()
   description: string;
 
-  @Prop()
-  royalties: number;
+  // @Prop()
+  // royalties: number;
 
-  @Prop()
-  size: string;
+  // @Prop()
+  // size: string;
 
   // @Prop()
   // name: CategoryNameEnum;
