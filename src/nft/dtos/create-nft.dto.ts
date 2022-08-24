@@ -33,8 +33,8 @@ export class CreateNftDto extends BaseModel {
   @IsOptional()
   mint: boolean;
 
-  @IsOptional()
-  mintCost: number;
+  // @IsOptional()
+  // mintCost: number;
 
   @IsOptional()
   @IsNumber()
