@@ -143,6 +143,7 @@ export class CollectionService {
             imageCollection: '$_id.imageCollection',
             total: '$total',
             maxPower: '$maxPower',
+            owners: [],
           },
         },
       ]);
@@ -239,10 +240,14 @@ export class CollectionService {
       //     }
       //   });
       // });
-      return {
-        compare: result,
-        owners: data,
-      };
+      result.map((item) => {
+        data.map((val) => {
+          if (item.collectionId.toString() === val.idColl.toString()) {
+            item.owners.push(val);
+          }
+        });
+      });
+      return result;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);
