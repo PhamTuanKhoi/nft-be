@@ -19,6 +19,10 @@ export class QueryNftDto extends QueryDto {
   level: Number;
 
   @IsOptional()
+  @IsString()
+  collectionid: string;
+  
+  @IsOptional()
   status: string;
 
   @IsOptional()
