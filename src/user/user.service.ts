@@ -427,7 +427,11 @@ export class UserService {
 
   async updateProfile(id: ID, payload: UpdateUserDto) {
     try {
-      if (payload.email !== payload.emailOld) {
+      if (
+        payload.email &&
+        payload.emailOld &&
+        payload.email !== payload.emailOld
+      ) {
         const findUserByEmail = await this.model.findOne({
           email: payload.email,
         });

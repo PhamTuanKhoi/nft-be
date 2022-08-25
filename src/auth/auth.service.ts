@@ -109,23 +109,26 @@ export class AuthService {
   }
 
   async resetPassword(payload: ResetPasswordDto) {
-    const token = await this.tokenModel.findOne({ userId: payload.userId });
+    // const token = await this.tokenModel.findOne({ userId: payload.userId });
+    const token = await this.usersService.findOneById(payload.userId);
     if (!token) {
       throw new HttpException(
-        'Invalid or expired password reset token',
+        // 'Invalid or expired password reset token',
+        'User not found',
         HttpStatus.NOT_FOUND,
       );
     }
-    const isValid = await bcrypt.compare(payload.token, token.token);
-    if (!isValid) {
-      throw new HttpException(
-        'Invalid or expired password reset token',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    await this.usersService.update(payload.userId, {
-      password: payload.password,
-    });
+    // const isValid = await bcrypt.compare(payload.token, token.token);
+    // if (!isValid) {
+    //   throw new HttpException(
+    //     'Invalid or expired password reset token',
+    //     HttpStatus.NOT_FOUND,
+    //   );
+    // }
+    // await this.usersService.update(payload.userId, {
+    //   password: payload.password,
+    //   confirmPassword: payload.confirmPassword,
+    // });
     await token.deleteOne();
     return true;
   }
