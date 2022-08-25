@@ -25,7 +25,7 @@ export class NftService {
     @InjectModel(NFT) private readonly model: ReturnModelType<typeof NFT>,
     @Inject(forwardRef(() => MiningService))
     private readonly miningService: MiningService,
-  ) {}
+  ) { }
 
   get = async (query: QueryNftDto): Promise<PaginateResponse<NFT>> => {
     let tmp: any = [
@@ -45,6 +45,19 @@ export class NftService {
           $match: {
             level: query.level,
           },
+        },
+      ];
+    }
+    if (query.collectionid) {
+      tmp = [
+        ...tmp,
+        {
+          $match: {
+            $expr: {
+              $eq: ['$collectionNft', { $toObjectId: query.collectionid }],
+            },
+          },
+         
         },
       ];
     }
