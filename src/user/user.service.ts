@@ -99,8 +99,8 @@ export class UserService {
       query.page > 0
     ) {
       findQuery = findQuery
-        .limit(query.limit)
-        .skip((query.page - 1) * query.limit);
+        .skip((query.page - 1) * query.limit)
+        .limit(query.limit);
     }
 
     const result = await findQuery.exec();

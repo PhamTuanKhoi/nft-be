@@ -47,4 +47,7 @@ export class Project extends BaseModel {
 
   @prop({ ref: () => User })
   likes: Ref<User>[];
+
+  @prop({ ref: () => User, required: true })
+  creater: Ref<User>;
 }
