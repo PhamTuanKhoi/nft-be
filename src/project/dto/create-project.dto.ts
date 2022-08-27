@@ -55,4 +55,7 @@ export class CreateProjectDto {
   // followers: Array<T>;
 
   // viewers: Array;
+  @IsNotEmpty()
+  @IsOptional()
+  creator: string;
 }
