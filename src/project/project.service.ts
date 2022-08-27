@@ -183,9 +183,8 @@ export class ProjectService {
       await this.problemCategoryService.isModelExist(
         updateProjectDto.problemCategory,
       );
-      const updated = await this.model.findByIdAndUpdate(id, updateProjectDto, {
-        new: true,
-      });
+      const updated = await this.model
+      .findByIdAndUpdate(id, updateProjectDto, {new: true});
       this.logger.log(`updated project by id#${updated._id}`);
       return updated;
     } catch (error) {
