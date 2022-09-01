@@ -44,4 +44,7 @@ export class NFT extends BaseModel {
 
   @prop({ default: 0 })
   viewer: number;
+
+  @prop({ ref: () => User, default: [] })
+  likes: Ref<User>[];
 }

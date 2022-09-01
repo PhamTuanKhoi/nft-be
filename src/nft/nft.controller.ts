@@ -32,6 +32,10 @@ export class NftController {
     return await this.service.get(query);
   }
 
+  @Get('likes/:id/:userId')
+  async likes(@Param('id') id: string, @Param('userId') userId: string) {
+    return this.service.likes(id, userId);
+  }
   @Get('viewer/:id')
   async viewer(@Param('id') id: ID) {
     return this.service.viewer(id);

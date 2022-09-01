@@ -45,7 +45,7 @@ export class Project extends BaseModel {
   @prop({ default: [] })
   viewers: Ref<User>[];
 
-  @prop({ ref: () => User })
+  @prop({ ref: () => User, default: [] })
   likes: Ref<User>[];
 
   @prop({ ref: () => User, required: true })
