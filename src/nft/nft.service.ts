@@ -25,7 +25,7 @@ export class NftService {
     @InjectModel(NFT) private readonly model: ReturnModelType<typeof NFT>,
     @Inject(forwardRef(() => MiningService))
     private readonly miningService: MiningService,
-  ) { }
+  ) {}
 
   get = async (query: QueryNftDto): Promise<PaginateResponse<NFT>> => {
     let tmp: any = [
@@ -57,7 +57,6 @@ export class NftService {
               $eq: ['$collectionNft', { $toObjectId: query.collectionid }],
             },
           },
-         
         },
       ];
     }
@@ -141,6 +140,25 @@ export class NftService {
           {
             $match: {
               $expr: { $or: or },
+            },
+          },
+        ];
+      }
+    }
+    if (query.levels && query.levels !== undefined) {
+      // string to []
+      let levels = JSON.parse(query.levels);
+      let or = levels.map((item) => {
+        return {
+          level: item,
+        };
+      });
+      if (or?.length > 0) {
+        tmp = [
+          ...tmp,
+          {
+            $match: {
+              $or: or,
             },
           },
         ];
@@ -235,6 +253,46 @@ export class NftService {
   create = async (nft: CreateNftDto): Promise<NFT> => {
     return await this.model.create(nft);
   };
+
+  async likes(idNft, userId) {
+    try {
+      const nft = await this.model.findById(idNft);
+
+      if (!nft) {
+        throw new HttpException(
+          'not found nft have id ' + idNft,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      let likes = nft?.likes || [];
+      if (likes.includes(userId)) {
+        const unLike = await this.model.findByIdAndUpdate(
+          idNft,
+          {
+            likes: likes.filter(
+              (item) => item.toString() !== userId.toString(),
+            ),
+          },
+          { new: true },
+        );
+        this.logger.log(`unLike nft by id#${unLike?._id}`);
+        return unLike;
+      } else {
+        const like = await this.model.findByIdAndUpdate(
+          idNft,
+          {
+            likes: [...likes, userId],
+          },
+          { new: true },
+        );
+        this.logger.log(`like nft by id#${like?._id}`);
+        return like;
+      }
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
 
   async viewer(id: ID) {
     try {

@@ -21,10 +21,13 @@ export class QueryNftDto extends QueryDto {
   @IsOptional()
   @IsString()
   collectionid: string;
-  
+
   @IsOptional()
   status: string;
 
   @IsOptional()
   collection: string;
+
+  @IsOptional()
+  levels: string;
 }

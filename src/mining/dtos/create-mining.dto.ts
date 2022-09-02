@@ -1,4 +1,4 @@
-import { IsNumber } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { BaseModel } from 'src/global/base.model';
 
 export class CreateMiningDto extends BaseModel {
@@ -13,4 +13,8 @@ export class CreateMiningDto extends BaseModel {
 
   @IsNumber()
   miningTime: number;
+
+  @IsOptional()
+  @IsString()
+  levelName: string;
 }
