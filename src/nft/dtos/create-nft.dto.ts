@@ -39,4 +39,8 @@ export class CreateNftDto extends BaseModel {
   @IsOptional()
   @IsNumber()
   endTime: number;
+
+  @IsOptional()
+  @IsString()
+  levelName: string;
 }
