@@ -85,31 +85,31 @@ export class NftService {
       let status = JSON.parse(query.status);
       let or: any = [];
       if (status.mine === true) {
-        // endTime <= Date.now() && level < 12
+        // endTime <= Date.now() && level < 6
         or = [
           ...or,
           {
             endTime: { $lte: Date.now() },
-            level: { $lt: 12 },
+            level: { $lt: 6 },
           },
         ];
       }
       if (status.mining === true) {
-        // endTime >= Date.now() && level < 12
+        // endTime >= Date.now() && level < 6
         or = [
           ...or,
           {
             endTime: { $gte: Date.now() },
-            level: { $lt: 12 },
+            level: { $lt: 6 },
           },
         ];
       }
       if (status.mined === true) {
-        // endTime >= Date.now() && level < 12
+        // endTime >= Date.now() && level < 6
         or = [
           ...or,
           {
-            level: 12,
+            level: 6,
           },
         ];
       }
