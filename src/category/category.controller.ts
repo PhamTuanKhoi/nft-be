@@ -26,6 +26,16 @@ export class CategoryController {
     return await this.service.get(query);
   }
 
+  @Get('nft')
+  async mockNft() {
+    return await this.service.mockNft();
+  }
+
+  @Get('nft/mining')
+  async mockNftById(@Query() query: QueryCategoryDto) {
+    return await this.service.mockNftById(query);
+  }
+
   @Get(':id')
   async getById(@Param('id') id: ID) {
     return await this.service.getById(id);
