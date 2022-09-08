@@ -76,6 +76,56 @@ export class CategoryService {
     };
   };
 
+  async mockNft() {
+    try {
+      return this.model.aggregate([
+        {
+          $lookup: {
+            from: 'collections',
+            localField: '_id',
+            foreignField: 'category',
+            pipeline: [
+              {
+                $lookup: {
+                  from: 'nfts',
+                  localField: '_id',
+                  foreignField: 'collectionNft',
+                  as: 'nfts',
+                },
+              },
+              // { $unwind: '$nfts' },
+            ],
+            as: 'collections',
+          },
+        },
+        {
+          $unwind: '$collections',
+        },
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+              name: '$title',
+              image: '$image',
+              nfts: '$collections.nfts',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            id: '$_id.id',
+            name: '$_id.name',
+            image: '$_id.image',
+            nfts: '$_id.nfts',
+          },
+        },
+      ]);
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
   getAll = async (): Promise<any> => {
     return this.model.find();
   };
