@@ -37,6 +37,36 @@ export class NftService {
           as: 'creator',
         },
       },
+      {
+        $lookup: {
+          from: 'collections',
+          localField: 'collectionNft',
+          foreignField: '_id',
+          as: 'collectionNft',
+        },
+      },
+      {
+        $unwind: '$collectionNft',
+      },
+      {
+        $lookup: {
+          from: 'minings',
+          let: {
+            levelNft: '$level',
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$level', '$$levelNft'] },
+              },
+            },
+          ],
+          as: 'mining',
+        },
+      },
+      {
+        $unwind: '$mining',
+      },
     ];
     if (query.level) {
       tmp = [
