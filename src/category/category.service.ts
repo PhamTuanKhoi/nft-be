@@ -180,6 +180,16 @@ export class CategoryService {
         {
           $unwind: '$collections',
         },
+        // {
+        //   $match: {
+        //     $expr: {
+        //       $eq: [
+        //         '$collections._id',
+        //         { $toObjectId: '630f4f733a47d0af75cafa36' },
+        //       ],
+        //     },
+        //   },
+        // },
         {
           $group: {
             _id: {
@@ -204,17 +214,16 @@ export class CategoryService {
           },
         },
       ];
-      // console.log(collectionId);
+
       if (query.collectionId) {
-        pipeline[2] = {
+        pipeline.splice(3, 0, {
           $match: {
             $expr: {
               $eq: ['$collections._id', { $toObjectId: query.collectionId }],
             },
           },
-        };
+        });
       }
-      console.log(pipeline);
       return this.model.aggregate(pipeline);
     } catch (error) {
       this.logger.error(error?.message, error.stack);
