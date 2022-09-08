@@ -127,13 +127,13 @@ export class CategoryService {
     }
   }
 
-  async mockNftById(id: ID) {
+  async mockNftById(query: QueryCategoryDto) {
     try {
-      return this.model.aggregate([
+      let pipeline: any = [
         {
           $match: {
             $expr: {
-              $eq: ['$_id', { $toObjectId: id }],
+              $eq: ['$_id', { $toObjectId: query.id }],
             },
           },
         },
@@ -203,7 +203,19 @@ export class CategoryService {
             nfts: '$_id.nfts',
           },
         },
-      ]);
+      ];
+      // console.log(collectionId);
+      if (query.collectionId) {
+        pipeline[2] = {
+          $match: {
+            $expr: {
+              $eq: ['$collections._id', { $toObjectId: query.collectionId }],
+            },
+          },
+        };
+      }
+      console.log(pipeline);
+      return this.model.aggregate(pipeline);
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);

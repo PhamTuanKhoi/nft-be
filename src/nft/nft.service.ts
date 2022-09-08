@@ -226,13 +226,74 @@ export class NftService {
     };
   };
 
-  getAll = async (): Promise<any> => {
-    return this.model
-      .find()
-      .populate('creator')
-      .populate('owner')
-      .populate('collectionNft');
-  };
+  // getAll = async (): Promise<any> => {
+  //   return this.model
+  //     .find()
+  //     .populate('creator')
+  //     .populate('owner')
+  //     .populate('collectionNft');
+  // };
+  async getAll() {
+    try {
+      return await this.model.aggregate([
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'creator',
+            foreignField: '_id',
+            as: 'creator',
+          },
+        },
+        {
+          $unwind: '$creator',
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'owner',
+            foreignField: '_id',
+            as: 'owner',
+          },
+        },
+        {
+          $unwind: '$owner',
+        },
+        {
+          $lookup: {
+            from: 'collections',
+            localField: 'collectionNft',
+            foreignField: '_id',
+            as: 'collectionNft',
+          },
+        },
+        {
+          $unwind: '$collectionNft',
+        },
+        {
+          $lookup: {
+            from: 'minings',
+            let: {
+              levelNft: '$level',
+            },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ['$level', '$$levelNft'] },
+                },
+              },
+            ],
+            as: 'mining',
+          },
+        },
+        {
+          $unwind: '$mining',
+        },
+      ]);
+    } catch (error) {
+      console.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
 
   async findOne(id: string) {
     try {
