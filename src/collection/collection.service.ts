@@ -254,6 +254,23 @@ export class CollectionService {
     }
   }
 
+  async getByIdCategory(category: ID) {
+    try {
+      return await this.model.aggregate([
+        {
+          $match: {
+            $expr: {
+              $eq: ['$category', { $toObjectId: category }],
+            },
+          },
+        },
+      ]);
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   getAll = async (): Promise<any> => {
     return await this.model.find().populate('nfts').populate('creator');
   };

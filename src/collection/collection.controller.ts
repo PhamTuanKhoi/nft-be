@@ -41,6 +41,11 @@ export class CollectionController {
     return this.service.ranking();
   }
   //GET v1/collections/:id
+  @Get('category/:id')
+  async getByIdCategory(@Param('id') id: ID) {
+    return this.service.getByIdCategory(id);
+  }
+  //GET v1/collections/:id
   @Get(':id')
   async getById(@Param('id') id: ID): Promise<Collection> {
     return this.service.getById(id);
