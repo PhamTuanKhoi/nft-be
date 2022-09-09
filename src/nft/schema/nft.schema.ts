@@ -49,5 +49,11 @@ export class NFT extends BaseModel {
   likes: Ref<User>[];
 
   @prop()
-  levelName: string;
+  nftId: number;
+
+  @prop()
+  metadata: string;
+
+  @prop({ default: false })
+  imported: boolean;
 }

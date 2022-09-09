@@ -1,6 +1,12 @@
 import { BaseModel } from 'src/global/base.model';
 import { CreateNftDto } from './create-nft.dto';
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { Ref } from '@typegoose/typegoose';
 import { User } from 'src/user/schemas/user.schema';
 import { Collection } from 'src/collection/schema/collection.schema';
@@ -51,4 +57,8 @@ export class UpdateNftDto extends BaseModel {
   @IsOptional()
   @IsNumber()
   total: number;
+
+  @IsOptional()
+  @IsBoolean()
+  imported: boolean;
 }

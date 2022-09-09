@@ -342,7 +342,14 @@ export class NftService {
   };
 
   create = async (nft: CreateNftDto): Promise<NFT> => {
-    return await this.model.create(nft);
+    try {
+      let id = Date.now();
+      const data = await this.model.create({ ...nft, nftId: id });
+      this.logger.log(`created a new nft by id#${data?._id}`);
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   async likes(idNft, userId) {

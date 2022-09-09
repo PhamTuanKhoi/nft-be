@@ -180,16 +180,6 @@ export class CategoryService {
         {
           $unwind: '$collections',
         },
-        // {
-        //   $match: {
-        //     $expr: {
-        //       $eq: [
-        //         '$collections._id',
-        //         { $toObjectId: '630f4f733a47d0af75cafa36' },
-        //       ],
-        //     },
-        //   },
-        // },
         {
           $group: {
             _id: {
