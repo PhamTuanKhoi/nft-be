@@ -30,6 +30,11 @@ export class NftService {
   get = async (query: QueryNftDto): Promise<PaginateResponse<NFT>> => {
     let tmp: any = [
       {
+        $match: {
+          mint: false,
+        },
+      },
+      {
         $lookup: {
           from: 'users',
           localField: 'creator',
@@ -194,6 +199,17 @@ export class NftService {
         ];
       }
     }
+
+    if (query.imported) {
+      tmp = [
+        {
+          $match: {
+            imported: query.imported,
+          },
+        },
+        ...tmp,
+      ];
+    }
     if (
       query.sortBy !== undefined &&
       query.sortBy.length > 0 &&
@@ -217,21 +233,6 @@ export class NftService {
         },
       ];
     }
-
-    // if (query.status) {
-    //   if(query.status === 1){
-    //     tmp = [
-    //       {
-    //         $match: {
-    //           endTime: {
-    //             $gte:
-    //           }
-    //         },
-    //       },
-    //       ...tmp,
-    //     ];
-    //   }
-    // }
 
     let findQuery = this.model.aggregate(tmp);
     const count = (await findQuery.exec()).length;
@@ -266,6 +267,16 @@ export class NftService {
   async getAll() {
     try {
       return await this.model.aggregate([
+        {
+          $match: {
+            mint: false,
+          },
+        },
+        {
+          $match: {
+            imported: true,
+          },
+        },
         {
           $lookup: {
             from: 'users',
@@ -342,7 +353,14 @@ export class NftService {
   };
 
   create = async (nft: CreateNftDto): Promise<NFT> => {
-    return await this.model.create(nft);
+    try {
+      let id = Date.now();
+      const data = await this.model.create({ ...nft, nftId: id });
+      this.logger.log(`created a new nft by id#${data?._id}`);
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   async likes(idNft, userId) {
@@ -439,7 +457,11 @@ export class NftService {
         nft.total = isNft.price + priced;
       }
       const updatedNft = await this.model
-        .findByIdAndUpdate(id, nft, { new: true })
+        .findByIdAndUpdate(
+          id,
+          { ...nft, level: nft.level >= 6 ? 6 : nft.level },
+          { new: true },
+        )
         .populate('creator')
         .populate('owner')
         .populate('collectionNft');

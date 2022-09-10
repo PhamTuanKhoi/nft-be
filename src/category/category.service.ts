@@ -90,6 +90,18 @@ export class CategoryService {
                   from: 'nfts',
                   localField: '_id',
                   foreignField: 'collectionNft',
+                  pipeline: [
+                    {
+                      $match: {
+                        imported: true,
+                      },
+                    },
+                    {
+                      $match: {
+                        mint: false,
+                      },
+                    },
+                  ],
                   as: 'nfts',
                 },
               },
@@ -150,6 +162,16 @@ export class CategoryService {
                   foreignField: 'collectionNft',
                   pipeline: [
                     {
+                      $match: {
+                        imported: true,
+                      },
+                    },
+                    {
+                      $match: {
+                        mint: false,
+                      },
+                    },
+                    {
                       $lookup: {
                         from: 'minings',
                         let: {
@@ -180,16 +202,6 @@ export class CategoryService {
         {
           $unwind: '$collections',
         },
-        // {
-        //   $match: {
-        //     $expr: {
-        //       $eq: [
-        //         '$collections._id',
-        //         { $toObjectId: '630f4f733a47d0af75cafa36' },
-        //       ],
-        //     },
-        //   },
-        // },
         {
           $group: {
             _id: {

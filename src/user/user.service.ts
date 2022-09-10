@@ -212,7 +212,7 @@ export class UserService {
               name: '$displayName',
               avatar: '$avatar',
               power: '$power',
-              collections: '$nfts.collections',
+              nfts: '$nfts',
             },
           },
         },
@@ -223,7 +223,7 @@ export class UserService {
             name: '$_id.name',
             avatar: '$_id.avatar',
             power: '$_id.power',
-            collections: '$_id.collections',
+            nfts: '$_id.nfts',
           },
         },
       ]);
