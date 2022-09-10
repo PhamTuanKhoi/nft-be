@@ -24,7 +24,7 @@ export class NFT extends BaseModel {
   @prop({ ref: () => Collection })
   collectionNft: Ref<Collection>;
 
-  @prop({ default: 1 })
+  @prop({ default: 1, max: 6 })
   level: number;
 
   // @prop({ default: 0 })

@@ -30,6 +30,11 @@ export class NftService {
   get = async (query: QueryNftDto): Promise<PaginateResponse<NFT>> => {
     let tmp: any = [
       {
+        $match: {
+          mint: false,
+        },
+      },
+      {
         $lookup: {
           from: 'users',
           localField: 'creator',
@@ -264,6 +269,11 @@ export class NftService {
       return await this.model.aggregate([
         {
           $match: {
+            mint: false,
+          },
+        },
+        {
+          $match: {
             imported: true,
           },
         },
@@ -447,7 +457,11 @@ export class NftService {
         nft.total = isNft.price + priced;
       }
       const updatedNft = await this.model
-        .findByIdAndUpdate(id, nft, { new: true })
+        .findByIdAndUpdate(
+          id,
+          { ...nft, level: nft.level >= 6 ? 6 : nft.level },
+          { new: true },
+        )
         .populate('creator')
         .populate('owner')
         .populate('collectionNft');

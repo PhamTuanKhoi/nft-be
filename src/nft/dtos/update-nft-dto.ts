@@ -10,6 +10,7 @@ import {
 import { Ref } from '@typegoose/typegoose';
 import { User } from 'src/user/schemas/user.schema';
 import { Collection } from 'src/collection/schema/collection.schema';
+import { Type } from 'class-transformer';
 
 export class UpdateNftDto extends BaseModel {
   @IsOptional()
@@ -44,6 +45,7 @@ export class UpdateNftDto extends BaseModel {
   level: number;
 
   @IsOptional()
+  @Type(() => Boolean)
   mint: boolean;
 
   @IsOptional()
