@@ -30,4 +30,8 @@ export class QueryNftDto extends QueryDto {
 
   @IsOptional()
   levels: string;
+
+  @IsOptional()
+  @Type(() => Boolean)
+  imported: boolean;
 }

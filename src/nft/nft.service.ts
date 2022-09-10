@@ -194,6 +194,17 @@ export class NftService {
         ];
       }
     }
+
+    if (query.imported) {
+      tmp = [
+        {
+          $match: {
+            imported: query.imported,
+          },
+        },
+        ...tmp,
+      ];
+    }
     if (
       query.sortBy !== undefined &&
       query.sortBy.length > 0 &&
@@ -217,21 +228,6 @@ export class NftService {
         },
       ];
     }
-
-    // if (query.status) {
-    //   if(query.status === 1){
-    //     tmp = [
-    //       {
-    //         $match: {
-    //           endTime: {
-    //             $gte:
-    //           }
-    //         },
-    //       },
-    //       ...tmp,
-    //     ];
-    //   }
-    // }
 
     let findQuery = this.model.aggregate(tmp);
     const count = (await findQuery.exec()).length;
@@ -266,6 +262,11 @@ export class NftService {
   async getAll() {
     try {
       return await this.model.aggregate([
+        {
+          $match: {
+            imported: true,
+          },
+        },
         {
           $lookup: {
             from: 'users',

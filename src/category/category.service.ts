@@ -90,6 +90,13 @@ export class CategoryService {
                   from: 'nfts',
                   localField: '_id',
                   foreignField: 'collectionNft',
+                  pipeline: [
+                    {
+                      $match: {
+                        imported: true,
+                      },
+                    },
+                  ],
                   as: 'nfts',
                 },
               },
@@ -149,6 +156,11 @@ export class CategoryService {
                   localField: '_id',
                   foreignField: 'collectionNft',
                   pipeline: [
+                    {
+                      $match: {
+                        imported: true,
+                      },
+                    },
                     {
                       $lookup: {
                         from: 'minings',
