@@ -139,6 +139,109 @@ export class CategoryService {
     }
   }
 
+  async totalPrice() {
+    try {
+      const totalPrice = await this.model.aggregate([
+        {
+          $lookup: {
+            from: 'collections',
+            localField: '_id',
+            foreignField: 'category',
+            as: 'collections',
+          },
+        },
+        {
+          $unwind: '$collections',
+        },
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: 'collectionNft',
+            foreignField: 'collections._id',
+            pipeline: [
+              {
+                $lookup: {
+                  from: 'minings',
+                  let: {
+                    levelNft: '$level',
+                  },
+                  pipeline: [
+                    {
+                      $match: {
+                        $expr: {
+                          $and: [{ $eq: ['$level', '$$levelNft'] }],
+                        },
+                      },
+                    },
+                  ],
+                  as: 'mining',
+                },
+              },
+              {
+                $unwind: '$mining',
+              },
+            ],
+            as: 'nfts',
+          },
+        },
+        {
+          $unwind: '$nfts',
+        },
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+              totalPrice: {
+                $sum: '$nfts.mining.price',
+              },
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            id: '$_id.id',
+            totalPrice: '$_id.totalPrice',
+          },
+        },
+      ]);
+      const result = await this.model.aggregate([
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+              title: '$title',
+              description: '$description',
+              image: '$image',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            cateId: '$_id.id',
+            title: '$_id.title',
+            description: '$_id.description',
+            image: '$_id.image',
+            total: [],
+          },
+        },
+      ]);
+
+      result.map((item) => {
+        totalPrice.map((val) => {
+          if (item.cateId.toString() === val.id.toString()) {
+            item.total.push(val.totalPrice);
+          }
+        });
+      });
+      return result;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   async mockNftById(query: QueryCategoryDto) {
     try {
       let pipeline: any = [
