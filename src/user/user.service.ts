@@ -191,6 +191,12 @@ export class UserService {
             foreignField: 'owner',
             pipeline: [
               {
+                $match: { mint: true },
+              },
+              {
+                $match: { imported: true },
+              },
+              {
                 $lookup: {
                   from: 'collections',
                   localField: 'collectionNft',
