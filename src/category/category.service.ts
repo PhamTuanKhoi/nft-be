@@ -96,11 +96,6 @@ export class CategoryService {
                         imported: true,
                       },
                     },
-                    {
-                      $match: {
-                        mint: false,
-                      },
-                    },
                   ],
                   as: 'nfts',
                 },
@@ -267,11 +262,6 @@ export class CategoryService {
                     {
                       $match: {
                         imported: true,
-                      },
-                    },
-                    {
-                      $match: {
-                        mint: false,
                       },
                     },
                     {
