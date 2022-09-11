@@ -30,11 +30,6 @@ export class NftService {
   get = async (query: QueryNftDto): Promise<PaginateResponse<NFT>> => {
     let tmp: any = [
       {
-        $match: {
-          mint: false,
-        },
-      },
-      {
         $lookup: {
           from: 'users',
           localField: 'creator',
@@ -125,7 +120,7 @@ export class NftService {
           ...or,
           {
             endTime: { $lte: Date.now() },
-            level: { $lt: 6 },
+            mint: false,
           },
         ];
       }
@@ -135,7 +130,7 @@ export class NftService {
           ...or,
           {
             endTime: { $gte: Date.now() },
-            level: { $lt: 6 },
+            mint: false,
           },
         ];
       }
@@ -144,7 +139,7 @@ export class NftService {
         or = [
           ...or,
           {
-            level: 6,
+            mint: true,
           },
         ];
       }
@@ -267,11 +262,6 @@ export class NftService {
   async getAll() {
     try {
       return await this.model.aggregate([
-        {
-          $match: {
-            mint: false,
-          },
-        },
         {
           $match: {
             imported: true,
