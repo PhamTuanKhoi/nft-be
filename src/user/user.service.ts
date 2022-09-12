@@ -159,32 +159,6 @@ export class UserService {
             as: 'winers',
           },
         },
-        // {
-        //   $project: {
-        //     winers: {
-        //       $filter: {
-        //         input: '$winers',
-        //         as: 'item',
-        //         cond: { $eq: ['$$item.badges.name', 'wip50'] },
-        //       },
-        //     },
-        //   },
-        // },
-        // {
-        //   $match: {
-        //     winers: {
-        //       $elemMatch: {
-        //         'badges.name': 'wip50',
-        //       },
-        //     },
-        //   },
-        // },
-        //        $expr: {
-        //   $eq: [
-        //     '$badges._id',
-        //     { $toObjectId: '631c1f4ee9ebcb729d4b01c7' },
-        //   ],
-        // },
         {
           $group: {
             _id: {
@@ -247,6 +221,28 @@ export class UserService {
                   foreignField: '_id',
                   as: 'collections',
                 },
+              },
+              {
+                $unwind: '$collections',
+              },
+              {
+                $lookup: {
+                  from: 'minings',
+                  let: {
+                    levelNft: '$level',
+                  },
+                  pipeline: [
+                    {
+                      $match: {
+                        $expr: { $eq: ['$level', '$$levelNft'] },
+                      },
+                    },
+                  ],
+                  as: 'mining',
+                },
+              },
+              {
+                $unwind: '$mining',
               },
             ],
             as: 'nfts',
