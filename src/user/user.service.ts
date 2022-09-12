@@ -192,6 +192,112 @@ export class UserService {
     }
   }
 
+  async squad() {
+    try {
+      const data = await this.model.aggregate([
+        {
+          $match: {
+            role: {
+              $ne: UserRoleEnum.ADMIN,
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: '_id',
+            foreignField: 'owner',
+            as: 'nfts',
+          },
+        },
+        {
+          $unwind: '$nfts',
+        },
+        {
+          $project: {
+            nfts: '$nfts',
+          },
+        },
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+            },
+            total: {
+              $sum: '$nfts.total',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            userid: '$_id.id',
+            total: '$total',
+          },
+        },
+      ]);
+
+      const users = await this.model.aggregate([
+        {
+          $match: {
+            role: {
+              $ne: UserRoleEnum.ADMIN,
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: '_id',
+            foreignField: 'owner',
+            as: 'nfts',
+          },
+        },
+        {
+          $project: {
+            displayName: '$displayName',
+            avatar: '$avatar',
+            nfts: '$nfts',
+          },
+        },
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+              displayName: '$displayName',
+              avatar: '$avatar',
+              nfts: '$nfts',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            id: '$_id.id',
+            displayName: '$_id.displayName',
+            avatar: '$_id.avatar',
+            nfts: '$_id.nfts',
+            valuePower: '',
+          },
+        },
+      ]);
+      //push toatal
+      data.map((item1) => {
+        users.map((item2) => {
+          if (item1.userid.toString() === item2.id.toString()) {
+            item2.valuePower = item1.total;
+          }
+        });
+      });
+      //xx
+      users.sort((a, b) => b.valuePower - a.valuePower);
+      return users;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   async coreteam(id: string) {
     try {
       const data = await this.model.aggregate([

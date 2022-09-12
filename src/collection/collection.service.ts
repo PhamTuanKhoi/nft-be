@@ -219,27 +219,6 @@ export class CollectionService {
           },
         },
       ]);
-      // data.filter(
-      //   function (el) {
-      //     return this.has(el.Id);
-      //   },
-      //   new Set(
-      //     result.map((res) => {
-      //       if (res.Id === el.Id) {
-
-      //       }
-      //     }),
-      //   ),
-      // );
-      // return a;
-
-      // result.filter(function (o) {
-      //   return data.some(function (o2) {
-      //     if (o.Id === o2.Id) {
-      //       result.push(o2);
-      //     }
-      //   });
-      // });
       result.map((item) => {
         data.map((val) => {
           if (item.collectionId.toString() === val.idColl.toString()) {
