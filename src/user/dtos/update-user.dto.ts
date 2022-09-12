@@ -82,4 +82,12 @@ export class UpdateUserDto {
   @IsOptional()
   @IsNumber()
   power: number;
+
+  @IsOptional()
+  @IsString()
+  squadName: string;
+
+  @IsString()
+  @IsString()
+  squadImage: string;
 }

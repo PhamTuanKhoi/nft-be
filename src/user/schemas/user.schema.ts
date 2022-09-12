@@ -71,4 +71,10 @@ export class User extends BaseModel {
 
   @prop({ default: 0 })
   power: number;
+
+  @prop()
+  squadName: string;
+
+  @prop()
+  squadImage: string;
 }
