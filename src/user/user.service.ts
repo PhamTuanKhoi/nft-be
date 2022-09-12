@@ -114,8 +114,34 @@ export class UserService {
     };
   }
 
-  async ranking() {
+  async ranking(query: { badges: string }) {
     try {
+      // console.log(query);
+      let pipelineWiners: any = [
+        {
+          $lookup: {
+            from: 'badges',
+            localField: 'badges',
+            foreignField: '_id',
+            as: 'badges',
+          },
+        },
+        { $unwind: '$badges' },
+        { $sort: { 'badges.scores': -1 } },
+      ];
+
+      if (query.badges) {
+        pipelineWiners = [
+          ...pipelineWiners,
+          {
+            $match: {
+              $expr: {
+                $eq: ['$badges._id', { $toObjectId: query.badges }],
+              },
+            },
+          },
+        ];
+      }
       const result = await this.model.aggregate([
         {
           $match: {
@@ -129,21 +155,36 @@ export class UserService {
             from: 'winers',
             localField: '_id',
             foreignField: 'user',
-            pipeline: [
-              {
-                $lookup: {
-                  from: 'badges',
-                  localField: 'badges',
-                  foreignField: '_id',
-                  as: 'badges',
-                },
-              },
-              { $unwind: '$badges' },
-              { $sort: { 'badges.scores': -1 } },
-            ],
+            pipeline: pipelineWiners,
             as: 'winers',
           },
         },
+        // {
+        //   $project: {
+        //     winers: {
+        //       $filter: {
+        //         input: '$winers',
+        //         as: 'item',
+        //         cond: { $eq: ['$$item.badges.name', 'wip50'] },
+        //       },
+        //     },
+        //   },
+        // },
+        // {
+        //   $match: {
+        //     winers: {
+        //       $elemMatch: {
+        //         'badges.name': 'wip50',
+        //       },
+        //     },
+        //   },
+        // },
+        //        $expr: {
+        //   $eq: [
+        //     '$badges._id',
+        //     { $toObjectId: '631c1f4ee9ebcb729d4b01c7' },
+        //   ],
+        // },
         {
           $group: {
             _id: {
@@ -167,6 +208,9 @@ export class UserService {
           },
         },
       ]);
+      if (query.badges) {
+        return result.filter((item) => item.winers.length > 0);
+      }
       return result;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
