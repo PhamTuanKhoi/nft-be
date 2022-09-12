@@ -37,8 +37,8 @@ export class UserController {
   }
 
   @Get('ranking')
-  async ranking() {
-    return await this.service.ranking();
+  async ranking(@Query() query: { badges: string }) {
+    return await this.service.ranking(query);
   }
 
   @Get('power/:id/:nft')

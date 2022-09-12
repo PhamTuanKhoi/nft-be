@@ -114,8 +114,34 @@ export class UserService {
     };
   }
 
-  async ranking() {
+  async ranking(query: { badges: string }) {
     try {
+      // console.log(query);
+      let pipelineWiners: any = [
+        {
+          $lookup: {
+            from: 'badges',
+            localField: 'badges',
+            foreignField: '_id',
+            as: 'badges',
+          },
+        },
+        { $unwind: '$badges' },
+        { $sort: { 'badges.scores': -1 } },
+      ];
+
+      if (query.badges) {
+        pipelineWiners = [
+          ...pipelineWiners,
+          {
+            $match: {
+              $expr: {
+                $eq: ['$badges._id', { $toObjectId: query.badges }],
+              },
+            },
+          },
+        ];
+      }
       const result = await this.model.aggregate([
         {
           $match: {
@@ -129,18 +155,7 @@ export class UserService {
             from: 'winers',
             localField: '_id',
             foreignField: 'user',
-            pipeline: [
-              {
-                $lookup: {
-                  from: 'badges',
-                  localField: 'badges',
-                  foreignField: '_id',
-                  as: 'badges',
-                },
-              },
-              { $unwind: '$badges' },
-              { $sort: { 'badges.scores': -1 } },
-            ],
+            pipeline: pipelineWiners,
             as: 'winers',
           },
         },
@@ -167,6 +182,9 @@ export class UserService {
           },
         },
       ]);
+      if (query.badges) {
+        return result.filter((item) => item.winers.length > 0);
+      }
       return result;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
@@ -203,6 +221,28 @@ export class UserService {
                   foreignField: '_id',
                   as: 'collections',
                 },
+              },
+              {
+                $unwind: '$collections',
+              },
+              {
+                $lookup: {
+                  from: 'minings',
+                  let: {
+                    levelNft: '$level',
+                  },
+                  pipeline: [
+                    {
+                      $match: {
+                        $expr: { $eq: ['$level', '$$levelNft'] },
+                      },
+                    },
+                  ],
+                  as: 'mining',
+                },
+              },
+              {
+                $unwind: '$mining',
               },
             ],
             as: 'nfts',
