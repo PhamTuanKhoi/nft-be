@@ -136,6 +136,7 @@ export class CategoryService {
 
   async totalPrice() {
     try {
+      //price
       const totalPrice = await this.model.aggregate([
         {
           $lookup: {
@@ -186,9 +187,9 @@ export class CategoryService {
           $group: {
             _id: {
               id: '$_id',
-              totalPrice: {
-                $sum: '$nfts.mining.price',
-              },
+            },
+            totalPrice: {
+              $sum: '$nfts.mining.price',
             },
           },
         },
@@ -196,10 +197,11 @@ export class CategoryService {
           $project: {
             _id: 0,
             id: '$_id.id',
-            totalPrice: '$_id.totalPrice',
+            totalPrice: '$totalPrice',
           },
         },
       ]);
+      //data
       const result = await this.model.aggregate([
         {
           $group: {
@@ -218,7 +220,7 @@ export class CategoryService {
             title: '$_id.title',
             description: '$_id.description',
             image: '$_id.image',
-            total: [],
+            totalPrice: '',
           },
         },
       ]);
@@ -226,7 +228,7 @@ export class CategoryService {
       result.map((item) => {
         totalPrice.map((val) => {
           if (item.cateId.toString() === val.id.toString()) {
-            item.total.push(val.totalPrice);
+            item.totalPrice = val.totalPrice;
           }
         });
       });
