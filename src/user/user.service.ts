@@ -116,7 +116,6 @@ export class UserService {
 
   async ranking(query: { badges: string }) {
     try {
-      // console.log(query);
       let pipelineWiners: any = [
         {
           $lookup: {
@@ -142,6 +141,7 @@ export class UserService {
           },
         ];
       }
+
       const result = await this.model.aggregate([
         {
           $match: {
@@ -182,10 +182,11 @@ export class UserService {
           },
         },
       ]);
+
       if (query.badges) {
         return result.filter((item) => item.winers.length > 0);
       }
-      return result;
+      return result.filter((item) => item.power > 0);
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);
@@ -297,7 +298,8 @@ export class UserService {
       });
       //xx
       users.sort((a, b) => b.valuePower - a.valuePower);
-      return users;
+
+      return users.filter((item) => item.valuePower !== '');
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);
