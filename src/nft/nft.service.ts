@@ -159,7 +159,7 @@ export class NftService {
       let collection = JSON.parse(query.collection);
       let or = collection.map((item) => {
         return {
-          $eq: ['$collectionNft', { $toObjectId: item }],
+          $eq: ['$collectionNft._id', { $toObjectId: item }],
         };
       });
 
@@ -223,7 +223,7 @@ export class NftService {
         ...tmp,
         {
           $sort: {
-            createdAt: 1,
+            createdAt: -1,
           },
         },
       ];
