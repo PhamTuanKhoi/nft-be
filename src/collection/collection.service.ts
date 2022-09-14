@@ -284,6 +284,105 @@ export class CollectionService {
     }
   }
 
+  async totalPrice() {
+    try {
+      //price
+      const totalPrice = await this.model.aggregate([
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: '_id',
+            foreignField: 'collectionNft',
+            pipeline: [
+              {
+                $match: {
+                  imported: true,
+                },
+              },
+              {
+                $lookup: {
+                  from: 'minings',
+                  let: {
+                    levelNft: '$level',
+                  },
+                  pipeline: [
+                    {
+                      $match: {
+                        $expr: {
+                          $and: [{ $eq: ['$level', '$$levelNft'] }],
+                        },
+                      },
+                    },
+                  ],
+                  as: 'mining',
+                },
+              },
+              {
+                $unwind: '$mining',
+              },
+            ],
+            as: 'nfts',
+          },
+        },
+        {
+          $unwind: '$nfts',
+        },
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+            },
+            totalPrice: {
+              $sum: '$nfts.mining.price',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            id: '$_id.id',
+            totalPrice: '$totalPrice',
+          },
+        },
+      ]);
+      //data
+      const result = await this.model.aggregate([
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+              title: '$name',
+              description: '$description',
+              image: '$image',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            collId: '$_id.id',
+            title: '$_id.name',
+            description: '$_id.description',
+            image: '$_id.image',
+            totalPrice: '',
+          },
+        },
+      ]);
+
+      result.map((item) => {
+        totalPrice.map((val) => {
+          if (item.collId.toString() === val.id.toString()) {
+            item.totalPrice = val.totalPrice;
+          }
+        });
+      });
+      return result;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   async getByIdCategory(category: ID) {
     try {
       return await this.model.aggregate([
