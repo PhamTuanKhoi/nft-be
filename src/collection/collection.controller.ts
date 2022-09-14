@@ -35,6 +35,11 @@ export class CollectionController {
     return this.service.getAll();
   }
 
+  @Get('likes/:id/:userId')
+  async likes(@Param('id') id: string, @Param('userId') userId: string) {
+    return this.service.likes(id, userId);
+  }
+
   @Get('nft')
   async mockNft() {
     return await this.service.mockNft();

@@ -25,4 +25,7 @@ export class Collection extends BaseModel {
 
   @prop({ ref: () => User })
   creator: Ref<User>;
+
+  @prop({ ref: () => User, default: [] })
+  likes: Ref<User>[];
 }

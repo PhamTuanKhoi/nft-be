@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { ID } from 'src/global/interfaces/id.interface';
@@ -237,6 +243,11 @@ export class CollectionService {
     try {
       return this.model.aggregate([
         {
+          $sort: {
+            _id: -1,
+          },
+        },
+        {
           $lookup: {
             from: 'nfts',
             localField: '_id',
@@ -249,11 +260,6 @@ export class CollectionService {
               },
             ],
             as: 'nfts',
-          },
-        },
-        {
-          $sort: {
-            _id: -1,
           },
         },
         {
@@ -475,6 +481,46 @@ export class CollectionService {
   getAll = async (): Promise<any> => {
     return await this.model.find().populate('nfts').populate('creator');
   };
+
+  async likes(id, userId) {
+    try {
+      const collection = await this.model.findById(id);
+
+      if (!collection) {
+        throw new HttpException(
+          'not found collection have id ' + id,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      let likes = collection?.likes || [];
+      if (likes.includes(userId)) {
+        const unLike = await this.model.findByIdAndUpdate(
+          id,
+          {
+            likes: likes.filter(
+              (item) => item.toString() !== userId.toString(),
+            ),
+          },
+          { new: true },
+        );
+        this.logger.log(`unLike nft by id#${unLike?._id}`);
+        return unLike;
+      } else {
+        const like = await this.model.findByIdAndUpdate(
+          id,
+          {
+            likes: [...likes, userId],
+          },
+          { new: true },
+        );
+        this.logger.log(`like nft by id#${like?._id}`);
+        return like;
+      }
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
 
   create = async (collection: CreateCollectionDto): Promise<Collection> => {
     return await this.model.create(collection);

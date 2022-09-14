@@ -390,6 +390,7 @@ export class CategoryService {
       throw new BadRequestException(error?.message);
     }
   }
+
   getAll = async (): Promise<any> => {
     return this.model.find();
   };
