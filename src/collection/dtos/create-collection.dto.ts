@@ -18,9 +18,6 @@ export class CreateCollectionDto extends BaseModel {
   @IsOptional()
   creator: Ref<User>;
 
-  // @IsOptional()
-  // category: Ref<Category>;
-
   @IsOptional()
   nfts: Ref<NFT>[];
 }
