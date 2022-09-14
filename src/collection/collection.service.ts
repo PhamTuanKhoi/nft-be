@@ -383,6 +383,78 @@ export class CollectionService {
     }
   }
 
+  async mockNftById(id: string) {
+    try {
+      let pipeline: any = [
+        {
+          $match: {
+            $expr: {
+              $eq: ['$_id', { $toObjectId: id }],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: '_id',
+            foreignField: 'collectionNft',
+            pipeline: [
+              {
+                $match: {
+                  imported: true,
+                },
+              },
+              {
+                $lookup: {
+                  from: 'minings',
+                  let: {
+                    levelNft: '$level',
+                  },
+                  pipeline: [
+                    {
+                      $match: {
+                        $expr: {
+                          $and: [{ $eq: ['$level', '$$levelNft'] }],
+                        },
+                      },
+                    },
+                  ],
+                  as: 'mining',
+                },
+              },
+              { $unwind: '$mining' },
+            ],
+            as: 'nfts',
+          },
+        },
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+              nameSubcollection: '$name',
+              imageSubcollection: '$image',
+              nfts: '$nfts',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            id: '$_id.id',
+            nameSubcollection: '$_id.nameSubcollection',
+            imageSubcollection: '$_id.imageSubcollection',
+            nfts: '$_id.nfts',
+          },
+        },
+      ];
+
+      return this.model.aggregate(pipeline);
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   async getByIdCategory(category: ID) {
     try {
       return await this.model.aggregate([
