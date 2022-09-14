@@ -233,6 +233,228 @@ export class CollectionService {
     }
   }
 
+  async mockNft() {
+    try {
+      return this.model.aggregate([
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: '_id',
+            foreignField: 'collectionNft',
+            pipeline: [
+              {
+                $match: {
+                  imported: true,
+                },
+              },
+            ],
+            as: 'nfts',
+          },
+        },
+        {
+          $sort: {
+            _id: -1,
+          },
+        },
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+              name: '$name',
+              image: '$image',
+              likes: '$likes',
+              nfts: '$nfts',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            id: '$_id.id',
+            name: '$_id.name',
+            image: '$_id.image',
+            likes: '$_id.likes',
+            nfts: '$_id.nfts',
+          },
+        },
+      ]);
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
+  async totalPrice() {
+    try {
+      //price
+      const totalPrice = await this.model.aggregate([
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: '_id',
+            foreignField: 'collectionNft',
+            pipeline: [
+              {
+                $match: {
+                  imported: true,
+                },
+              },
+              {
+                $lookup: {
+                  from: 'minings',
+                  let: {
+                    levelNft: '$level',
+                  },
+                  pipeline: [
+                    {
+                      $match: {
+                        $expr: {
+                          $and: [{ $eq: ['$level', '$$levelNft'] }],
+                        },
+                      },
+                    },
+                  ],
+                  as: 'mining',
+                },
+              },
+              {
+                $unwind: '$mining',
+              },
+            ],
+            as: 'nfts',
+          },
+        },
+        {
+          $unwind: '$nfts',
+        },
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+            },
+            totalPrice: {
+              $sum: '$nfts.mining.price',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            id: '$_id.id',
+            totalPrice: '$totalPrice',
+          },
+        },
+      ]);
+      //data
+      const result = await this.model.aggregate([
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+              title: '$name',
+              description: '$description',
+              image: '$image',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            collId: '$_id.id',
+            title: '$_id.name',
+            description: '$_id.description',
+            image: '$_id.image',
+            totalPrice: '',
+          },
+        },
+      ]);
+
+      result.map((item) => {
+        totalPrice.map((val) => {
+          if (item.collId.toString() === val.id.toString()) {
+            item.totalPrice = val.totalPrice;
+          }
+        });
+      });
+      return result;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
+  async mockNftById(id: string) {
+    try {
+      let pipeline: any = [
+        {
+          $match: {
+            $expr: {
+              $eq: ['$_id', { $toObjectId: id }],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: '_id',
+            foreignField: 'collectionNft',
+            pipeline: [
+              {
+                $match: {
+                  imported: true,
+                },
+              },
+              {
+                $lookup: {
+                  from: 'minings',
+                  let: {
+                    levelNft: '$level',
+                  },
+                  pipeline: [
+                    {
+                      $match: {
+                        $expr: {
+                          $and: [{ $eq: ['$level', '$$levelNft'] }],
+                        },
+                      },
+                    },
+                  ],
+                  as: 'mining',
+                },
+              },
+              { $unwind: '$mining' },
+            ],
+            as: 'nfts',
+          },
+        },
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+              nameSubcollection: '$name',
+              imageSubcollection: '$image',
+              nfts: '$nfts',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            id: '$_id.id',
+            nameSubcollection: '$_id.nameSubcollection',
+            imageSubcollection: '$_id.imageSubcollection',
+            nfts: '$_id.nfts',
+          },
+        },
+      ];
+
+      return this.model.aggregate(pipeline);
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   async getByIdCategory(category: ID) {
     try {
       return await this.model.aggregate([

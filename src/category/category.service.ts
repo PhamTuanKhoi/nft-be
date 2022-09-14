@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { ID } from 'src/global/interfaces/id.interface';
@@ -109,11 +115,17 @@ export class CategoryService {
           $unwind: '$collections',
         },
         {
+          $sort: {
+            _id: -1,
+          },
+        },
+        {
           $group: {
             _id: {
               id: '$_id',
               name: '$title',
               image: '$image',
+              likes: '$likes',
               nfts: '$collections.nfts',
             },
           },
@@ -124,6 +136,7 @@ export class CategoryService {
             id: '$_id.id',
             name: '$_id.name',
             image: '$_id.image',
+            likes: '$_id.likes',
             nfts: '$_id.nfts',
           },
         },
@@ -332,6 +345,46 @@ export class CategoryService {
         });
       }
       return this.model.aggregate(pipeline);
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
+  async likes(id, userId) {
+    try {
+      const categories = await this.model.findById(id);
+
+      if (!categories) {
+        throw new HttpException(
+          'not found categories have id ' + id,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      let likes = categories?.likes || [];
+      if (likes.includes(userId)) {
+        const unLike = await this.model.findByIdAndUpdate(
+          id,
+          {
+            likes: likes.filter(
+              (item) => item.toString() !== userId.toString(),
+            ),
+          },
+          { new: true },
+        );
+        this.logger.log(`unLike nft by id#${unLike?._id}`);
+        return unLike;
+      } else {
+        const like = await this.model.findByIdAndUpdate(
+          id,
+          {
+            likes: [...likes, userId],
+          },
+          { new: true },
+        );
+        this.logger.log(`like nft by id#${like?._id}`);
+        return like;
+      }
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);
