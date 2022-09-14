@@ -17,8 +17,8 @@ export class Collection extends BaseModel {
   @prop()
   banner: string;
 
-  @prop({ ref: () => Category })
-  category: Ref<Category>;
+  // @prop({ ref: () => Category })
+  // category: Ref<Category>;
 
   @prop({ ref: () => NFT })
   nfts: Ref<NFT>[];
