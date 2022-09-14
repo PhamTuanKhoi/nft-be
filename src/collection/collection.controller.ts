@@ -35,6 +35,11 @@ export class CollectionController {
     return this.service.getAll();
   }
 
+  @Get('nft')
+  async mockNft() {
+    return await this.service.mockNft();
+  }
+
   // GET v1/collections/
   @Get('ranking')
   async ranking() {

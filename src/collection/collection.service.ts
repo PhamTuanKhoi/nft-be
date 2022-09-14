@@ -233,6 +233,57 @@ export class CollectionService {
     }
   }
 
+  async mockNft() {
+    try {
+      return this.model.aggregate([
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: '_id',
+            foreignField: 'collectionNft',
+            pipeline: [
+              {
+                $match: {
+                  imported: true,
+                },
+              },
+            ],
+            as: 'nfts',
+          },
+        },
+        {
+          $sort: {
+            _id: -1,
+          },
+        },
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+              name: '$name',
+              image: '$image',
+              likes: '$likes',
+              nfts: '$nfts',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            id: '$_id.id',
+            name: '$_id.name',
+            image: '$_id.image',
+            likes: '$_id.likes',
+            nfts: '$_id.nfts',
+          },
+        },
+      ]);
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   async getByIdCategory(category: ID) {
     try {
       return await this.model.aggregate([
