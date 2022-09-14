@@ -41,6 +41,11 @@ export class CategoryController {
     return await this.service.mockNftById(query);
   }
 
+  @Get('likes/:id/:userId')
+  async likes(@Param('id') id: string, @Param('userId') userId: string) {
+    return this.service.likes(id, userId);
+  }
+
   @Get(':id')
   async getById(@Param('id') id: ID) {
     return await this.service.getById(id);

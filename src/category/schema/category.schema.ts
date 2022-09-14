@@ -1,6 +1,7 @@
-import { Prop } from '@typegoose/typegoose';
+import { prop, Ref } from '@typegoose/typegoose';
 import { Type } from 'class-transformer';
 import { BaseModel } from 'src/global/base.model';
+import { User } from 'src/user/schemas/user.schema';
 
 export enum CategoryNameEnum {
   Art = 'Art',
@@ -9,27 +10,15 @@ export enum CategoryNameEnum {
   Sports = 'Sports',
 }
 export class Category extends BaseModel {
-  @Prop()
+  @prop()
   title: CategoryNameEnum;
 
-  @Prop()
+  @prop()
   image: string;
 
-  // @Prop()
-  // method: string;
-
-  // @Prop()
-  // price: number;
-
-  @Prop()
+  @prop()
   description: string;
 
-  // @Prop()
-  // royalties: number;
-
-  // @Prop()
-  // size: string;
-
-  // @Prop()
-  // name: CategoryNameEnum;
+  @prop({ ref: () => User, default: [] })
+  likes: Ref<User>[];
 }
