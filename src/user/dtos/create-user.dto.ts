@@ -18,6 +18,7 @@ export class CreateUserDto {
   @Type(() => String)
   avatar: string;
 
+  @IsOptional()
   @IsEmail()
   @Type(() => String)
   email: string;
@@ -33,6 +34,7 @@ export class CreateUserDto {
   @Length(2, 30)
   displayName: string;
 
+  @IsOptional()
   @IsString()
   @Type(() => String)
   @Length(2, 100)

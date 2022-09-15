@@ -87,7 +87,7 @@ export class UpdateUserDto {
   @IsString()
   squadName: string;
 
-  @IsString()
+  @IsOptional()
   @IsString()
   squadImage: string;
 }
