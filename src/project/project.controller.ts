@@ -31,6 +31,11 @@ export class ProjectController {
     return await this.projectService.get(query);
   }
 
+  @Get('mined')
+  async mined() {
+    return await this.projectService.mined();
+  }
+
   @Get()
   findAll() {
     return this.projectService.findAll();
