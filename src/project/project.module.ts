@@ -12,5 +12,6 @@ import { UserService } from 'src/user/user.service';
   ],
   controllers: [ProjectController],
   providers: [ProjectService],
+  exports: [ProjectService],
 })
 export class ProjectModule {}

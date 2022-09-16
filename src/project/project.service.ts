@@ -13,7 +13,7 @@ import { ProblemCategoryService } from 'src/problem-category/problem-category.se
 import { CreateProjectDto } from './dto/create-project.dto';
 import { QueryProjectDto } from './dto/query-paging.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { Project } from './schema/project.schema';
+import { Project, ProjectStatusEnum } from './schema/project.schema';
 
 @Injectable()
 export class ProjectService {
@@ -160,6 +160,14 @@ export class ProjectService {
     };
   }
 
+  async mined() {
+    try {
+      return this.model.find({ status: ProjectStatusEnum.Mined });
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
   findAll() {
     try {
       return this.model.find();
@@ -183,8 +191,9 @@ export class ProjectService {
       await this.problemCategoryService.isModelExist(
         updateProjectDto.problemCategory,
       );
-      const updated = await this.model
-      .findByIdAndUpdate(id, updateProjectDto, {new: true});
+      const updated = await this.model.findByIdAndUpdate(id, updateProjectDto, {
+        new: true,
+      });
       this.logger.log(`updated project by id#${updated._id}`);
       return updated;
     } catch (error) {

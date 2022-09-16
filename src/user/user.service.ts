@@ -36,6 +36,8 @@ export class UserService {
     private readonly nftService: NftService,
     @Inject(forwardRef(() => MiningService))
     private readonly miningService: MiningService,
+    @Inject(forwardRef(() => ProjectService))
+    private readonly projectService: ProjectService,
   ) {}
 
   async findAll(query: QueryUserDto): Promise<PaginateResponse<User>> {
@@ -300,6 +302,57 @@ export class UserService {
       users.sort((a, b) => b.valuePower - a.valuePower);
 
       return users.filter((item) => item.valuePower !== '');
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
+  async calculate() {
+    try {
+      const data = await this.model.aggregate([
+        {
+          $match: {
+            role: {
+              $ne: UserRoleEnum.ADMIN,
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: '_id',
+            foreignField: 'owner',
+            as: 'nfts',
+          },
+        },
+        {
+          $unwind: '$nfts',
+        },
+        {
+          $group: {
+            _id: { id: '$_id' },
+            minedValue: { $sum: '$nfts.price' },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            minedValue: '$minedValue',
+          },
+        },
+      ]);
+
+      const minedValue = data.reduce((a, b) => a + b.minedValue, 0);
+
+      const projects = await this.projectService.mined();
+
+      const user = await this.model.find({ role: { $ne: UserRoleEnum.ADMIN } });
+      return {
+        minedValue,
+        coreChanger: user.length,
+        mintedProject: projects.length,
+      };
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);
