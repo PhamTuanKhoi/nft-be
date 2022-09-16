@@ -595,6 +595,7 @@ export class UserService {
         const findUserByEmail = await this.model.findOne({
           email: payload.email,
         });
+
         if (findUserByEmail) {
           throw new HttpException(
             'Email already exists',
@@ -602,6 +603,7 @@ export class UserService {
           );
         }
       }
+
       if (
         payload.password &&
         payload.confirmPassword &&
@@ -612,6 +614,7 @@ export class UserService {
           HttpStatus.BAD_REQUEST,
         );
       }
+
       if (
         payload.password &&
         payload.confirmPassword &&

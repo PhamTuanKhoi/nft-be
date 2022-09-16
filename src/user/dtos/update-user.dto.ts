@@ -26,8 +26,7 @@ export class UpdateUserDto {
   avatar: string;
 
   @IsOptional()
-  @IsEmail()
-  @Type(() => String)
+  @IsString()
   email: string;
 
   @IsOptional()
