@@ -46,6 +46,14 @@ export class ProjectController {
     return this.projectService.findOne(id);
   }
 
+  @Patch('vote/:id')
+  vote(
+    @Param('id') id: string,
+    @Body() payload: { power: string; value: string },
+  ) {
+    return this.projectService.vote(id, payload);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
     return this.projectService.update(id, updateProjectDto);

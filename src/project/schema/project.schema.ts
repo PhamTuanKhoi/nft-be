@@ -33,11 +33,11 @@ export class Project extends BaseModel {
   @prop()
   address: string;
 
-  @prop()
-  miningValue: number;
+  @prop({ default: 0 })
+  value: string;
 
-  @prop()
-  miningPower: number;
+  @prop({ default: 0 })
+  power: string;
 
   @prop({ default: [] })
   followers: Ref<User>[];
