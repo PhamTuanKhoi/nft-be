@@ -41,12 +41,10 @@ export class CreateProjectDto {
   address: string;
 
   @IsOptional()
-  @IsNumber()
-  miningValue: number;
+  value: string;
 
   @IsOptional()
-  @IsNumber()
-  miningPower: number;
+  power: string;
 
   //   @IsNotEmpty()
   //   @IsString()

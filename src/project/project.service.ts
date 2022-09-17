@@ -186,6 +186,38 @@ export class ProjectService {
     }
   }
 
+  async vote(id: string, voteProject) {
+    try {
+      const vote = await this.findOne(id);
+      if (!vote) {
+        throw new HttpException('Project not found', HttpStatus.NOT_FOUND);
+      }
+
+      if (vote.value) {
+        voteProject.value = +vote.value + +voteProject.value;
+      }
+
+      if (vote.power) {
+        voteProject.power = +vote.power + +voteProject.power;
+      }
+
+      const voted = await this.model.findByIdAndUpdate(
+        id,
+        {
+          ...voteProject,
+          value: +voteProject.value,
+          power: +voteProject.power,
+        },
+        { new: true },
+      );
+      this.logger.log(`voted a project by id#${voted._id}`);
+      return voted;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   async update(id: string, updateProjectDto: UpdateProjectDto) {
     try {
       await this.problemCategoryService.isModelExist(
