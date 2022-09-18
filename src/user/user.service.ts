@@ -308,6 +308,49 @@ export class UserService {
     }
   }
 
+  async minedValue(id: string) {
+    try {
+      const data = await this.model.aggregate([
+        {
+          $match: {
+            $expr: {
+              $eq: ['$_id', { $toObjectId: id }],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: '_id',
+            foreignField: 'owner',
+            as: 'nfts',
+          },
+        },
+        {
+          $unwind: '$nfts',
+        },
+        {
+          $group: {
+            _id: '$_id',
+            value: {
+              $sum: '$nfts.price',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            minedValue: '$value',
+          },
+        },
+      ]);
+      return data;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   async calculate() {
     try {
       const data = await this.model.aggregate([

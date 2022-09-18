@@ -46,6 +46,11 @@ export class UserController {
     return await this.service.squad();
   }
 
+  @Get('mined-value/:id')
+  async minedValue(@Param('id') id: string) {
+    return this.service.minedValue(id);
+  }
+
   @Get('calculate')
   async calculate() {
     return await this.service.calculate();
