@@ -201,12 +201,22 @@ export class ProjectService {
         voteProject.power = +vote.power + +voteProject.power;
       }
 
+      let value =
+        +voteProject.value.toFixed(2) < 0.01
+          ? 0.01
+          : +voteProject.value.toFixed(2);
+
+      let power =
+        +voteProject.power.toFixed(2) < 0.01
+          ? 0.01
+          : +voteProject.power.toFixed(2);
+
       const voted = await this.model.findByIdAndUpdate(
         id,
         {
           ...voteProject,
-          value: +voteProject.value,
-          power: +voteProject.power,
+          value: +value,
+          power: +power,
         },
         { new: true },
       );
