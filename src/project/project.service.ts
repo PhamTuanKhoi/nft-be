@@ -189,6 +189,56 @@ export class ProjectService {
     }
   }
 
+  async mineValue(id: string) {
+    try {
+      const data = await this.model.aggregate([
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'likes',
+            foreignField: '_id',
+            pipeline: [
+              // {
+              //   $match: {
+              //     $expr: {
+              //       $eq: ['$_id', { $toObjectId: id }],
+              //     },
+              //   },
+              // },
+              {
+                $lookup: {
+                  from: 'nfts',
+                  localField: '_id',
+                  foreignField: 'owner',
+                  as: 'nfts',
+                },
+              },
+              {
+                $unwind: '$nfts',
+              },
+            ],
+            as: 'users',
+          },
+        },
+        {
+          $unwind: '$users',
+        },
+        {
+          $group: {
+            _id: '$users._id',
+            mineValue: {
+              $sum: '$users.nfts.price',
+            },
+          },
+        },
+      ]);
+      return data;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   findOne(id: string) {
     try {
       return this.model.findById(id).populate('problemCategory');

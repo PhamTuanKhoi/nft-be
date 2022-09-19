@@ -195,6 +195,14 @@ export class UserService {
     }
   }
 
+  // async value(id: string) {
+  //   try {
+  //   } catch (error) {
+  //     this.logger.error(error?.message, error.stack);
+  //     throw new BadRequestException(error?.message);
+  //   }
+  // }
+
   async squad() {
     try {
       const data = await this.model.aggregate([
@@ -525,7 +533,6 @@ export class UserService {
 
   async isUpdatePower(id, payload) {
     const data = await this.findOne(id);
-
     if (!data) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
@@ -560,6 +567,7 @@ export class UserService {
       }
 
       let isPower = mining.price * mining.multiplier;
+
       const updatedPower = await this.isUpdatePower(id, { isPower });
       return updatedPower;
     } catch (error) {

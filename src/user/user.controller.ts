@@ -41,6 +41,11 @@ export class UserController {
     return await this.service.ranking(query);
   }
 
+  // @Get('mined-value')
+  // async value(@Param('id') id: string) {
+  //   return await this.service.value(id);
+  // }
+
   @Get('squad')
   async squad() {
     return await this.service.squad();
