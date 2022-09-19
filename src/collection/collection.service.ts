@@ -357,7 +357,7 @@ export class CollectionService {
           $group: {
             _id: {
               id: '$_id',
-              title: '$name',
+              name: '$name',
               description: '$description',
               image: '$image',
             },
@@ -374,6 +374,8 @@ export class CollectionService {
           },
         },
       ]);
+
+      // console.log(result);
 
       result.map((item) => {
         totalPrice.map((val) => {
@@ -439,6 +441,7 @@ export class CollectionService {
               id: '$_id',
               nameSubcollection: '$name',
               imageSubcollection: '$image',
+              descriptionSubcollection: '$symbol',
               nfts: '$nfts',
             },
           },
@@ -449,6 +452,7 @@ export class CollectionService {
             id: '$_id.id',
             nameSubcollection: '$_id.nameSubcollection',
             imageSubcollection: '$_id.imageSubcollection',
+            descriptionSubcollection: '$_id.descriptionSubcollection',
             nfts: '$_id.nfts',
           },
         },

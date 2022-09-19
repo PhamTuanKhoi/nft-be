@@ -525,15 +525,19 @@ export class UserService {
 
   async isUpdatePower(id, payload) {
     const data = await this.findOne(id);
+
     if (!data) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
+
     let isPower = data?.power + payload?.isPower;
+
     const updatedPower = await this.model.findByIdAndUpdate(
       id,
       { power: isPower },
       { new: true },
     );
+
     this.logger.log(`updated a power user by id#${updatedPower?._id}`);
     return updatedPower;
   }
@@ -541,16 +545,20 @@ export class UserService {
   async updatePower(id: string, nft: string) {
     try {
       const isNft = await this.nftService.findOne(nft);
+
       if (!isNft) {
         throw new HttpException('Nft not found', HttpStatus.NOT_FOUND);
       }
+
       const mining = await this.miningService.getByLevel(isNft?.level);
+
       if (!mining) {
         throw new HttpException(
           `Mining not found level#${isNft?.level}`,
           HttpStatus.NOT_FOUND,
         );
       }
+
       let isPower = mining.price * mining.multiplier;
       const updatedPower = await this.isUpdatePower(id, { isPower });
       return updatedPower;
