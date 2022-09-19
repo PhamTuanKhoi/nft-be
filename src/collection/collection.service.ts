@@ -375,7 +375,7 @@ export class CollectionService {
         },
       ]);
 
-      // console.log(result);
+      console.log(result);
 
       result.map((item) => {
         totalPrice.map((val) => {
