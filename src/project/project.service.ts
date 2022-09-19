@@ -115,6 +115,7 @@ export class ProjectService {
         },
       ];
     }
+
     if (filterQuery.status !== undefined) {
       pipeline.push({
         $match: {
@@ -122,6 +123,17 @@ export class ProjectService {
         },
       });
     }
+
+    // if (filterQuery.status !== undefined) {
+    //   let number = +filterQuery.status;
+    //   console.log(number, 'netx');
+    //   // pipeline.push({
+    //   //   $match: {
+    //   //     status: +filterQuery?.status,
+    //   //   },
+    //   // });
+    // }
+
     if (query.search) {
       pipeline.push({
         $match: {
