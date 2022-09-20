@@ -9,7 +9,9 @@ import {
 } from '@nestjs/common';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
+import { ID } from 'src/global/interfaces/id.interface';
 import { ProblemCategoryService } from 'src/problem-category/problem-category.service';
+import { ProjectHistoryService } from 'src/project-history/project-history.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { QueryProjectDto } from './dto/query-paging.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -23,6 +25,8 @@ export class ProjectService {
     private readonly model: ReturnModelType<typeof Project>,
     @Inject(forwardRef(() => ProblemCategoryService))
     private readonly problemCategoryService: ProblemCategoryService,
+    @Inject(forwardRef(() => ProjectHistoryService))
+    private readonly projectHistoryService: ProjectHistoryService,
   ) {}
   async create(createProjectDto: CreateProjectDto) {
     try {
@@ -37,6 +41,7 @@ export class ProjectService {
       throw new BadRequestException(error?.message);
     }
   }
+
   async LikeProjects(id, idproject) {
     const iduser = id;
     const nft = await this.model.findById(idproject);
@@ -56,17 +61,29 @@ export class ProjectService {
         },
         { new: true },
       );
+
+      await this.projectHistoryService.unLikeHistory(iduser, idproject);
+
       return data;
     }
+    //like
     if (!likes.includes(id)) {
       const data = this.model.findByIdAndUpdate(
         idproject,
         { likes: [...likes, iduser] },
         { new: true },
       );
+
+      await this.projectHistoryService.likeHistory({
+        user: iduser,
+        project: idproject,
+        datelike: new Date().getTime(),
+      });
+
       return data;
     }
   }
+
   async get(query: QueryProjectDto) {
     const { page, limit, sortType, sortBy, ...filterQuery } = query;
 
@@ -252,6 +269,76 @@ export class ProjectService {
         };
       });
       return result;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
+  async viewer(id: ID) {
+    try {
+      let view = 0;
+      const isProject = await this.model.findById(id).lean();
+
+      if (!isProject) {
+        throw new HttpException('Nft not fount !', HttpStatus.BAD_REQUEST);
+      }
+
+      if (isProject.viewer) {
+        view = isProject.viewer + 1;
+      }
+
+      const updatedViewer = await this.model.findByIdAndUpdate(id, {
+        viewer: view,
+      });
+
+      // console.log(isProject.viewer, view);
+      return updatedViewer;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
+  async detail(id: string) {
+    try {
+      const data = await this.model.aggregate([
+        {
+          $match: {
+            $expr: {
+              $eq: ['$_id', { $toObjectId: id }],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'problemcategories',
+            localField: 'problemCategory',
+            foreignField: '_id',
+            as: 'problemCategory',
+          },
+        },
+        {
+          $unwind: '$problemCategory',
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'likes',
+            foreignField: '_id',
+            as: 'users',
+          },
+        },
+        {
+          $lookup: {
+            from: 'projecthistories',
+            localField: '_id',
+            foreignField: 'project',
+            as: 'projecthistories',
+          },
+        },
+      ]);
+      return data;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);

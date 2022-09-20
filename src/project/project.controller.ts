@@ -12,6 +12,7 @@ import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { QueryProjectDto } from './dto/query-paging.dto';
+import { ID } from 'src/global/interfaces/id.interface';
 
 @Controller('projects')
 export class ProjectController {
@@ -44,6 +45,16 @@ export class ProjectController {
   @Get('mine-value/:id')
   async mineValue(@Param('id') id: string) {
     return await this.projectService.mineValue(id);
+  }
+
+  @Get('viewer/:id')
+  async viewer(@Param('id') id: ID) {
+    return this.projectService.viewer(id);
+  }
+
+  @Get('detail/:id')
+  detail(@Param('id') id: string) {
+    return this.projectService.detail(id);
   }
 
   @Get(':id')

@@ -50,4 +50,7 @@ export class Project extends BaseModel {
 
   @prop({ ref: () => User, required: true })
   creater: Ref<User>;
+
+  @prop({ default: 0 })
+  viewer: number;
 }

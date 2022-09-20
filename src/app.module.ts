@@ -16,6 +16,7 @@ import { ProblemCategoryModule } from './problem-category/problem-category.modul
 import { ProjectModule } from './project/project.module';
 import { BadgesModule } from './badges/badges.module';
 import { WinerModule } from './winer/winer.module';
+import { ProjectHistoryModule } from './project-history/project-history.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -33,6 +34,7 @@ import { WinerModule } from './winer/winer.module';
     ProjectModule,
     BadgesModule,
     WinerModule,
+    ProjectHistoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
