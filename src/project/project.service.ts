@@ -10,6 +10,7 @@ import {
 import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { ProblemCategoryService } from 'src/problem-category/problem-category.service';
+import { ProjectHistoryService } from 'src/project-history/project-history.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { QueryProjectDto } from './dto/query-paging.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -23,6 +24,8 @@ export class ProjectService {
     private readonly model: ReturnModelType<typeof Project>,
     @Inject(forwardRef(() => ProblemCategoryService))
     private readonly problemCategoryService: ProblemCategoryService,
+    @Inject(forwardRef(() => ProjectHistoryService))
+    private readonly projectHistoryService: ProjectHistoryService,
   ) {}
   async create(createProjectDto: CreateProjectDto) {
     try {
@@ -37,6 +40,7 @@ export class ProjectService {
       throw new BadRequestException(error?.message);
     }
   }
+
   async LikeProjects(id, idproject) {
     const iduser = id;
     const nft = await this.model.findById(idproject);
@@ -56,17 +60,29 @@ export class ProjectService {
         },
         { new: true },
       );
+
+      await this.projectHistoryService.unLikeHistory(iduser, idproject);
+
       return data;
     }
+    //like
     if (!likes.includes(id)) {
       const data = this.model.findByIdAndUpdate(
         idproject,
         { likes: [...likes, iduser] },
         { new: true },
       );
+
+      await this.projectHistoryService.likeHistory({
+        user: iduser,
+        project: idproject,
+        datelike: new Date().getTime(),
+      });
+
       return data;
     }
   }
+
   async get(query: QueryProjectDto) {
     const { page, limit, sortType, sortBy, ...filterQuery } = query;
 
