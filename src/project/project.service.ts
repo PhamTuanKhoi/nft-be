@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
+import { ID } from 'src/global/interfaces/id.interface';
 import { ProblemCategoryService } from 'src/problem-category/problem-category.service';
 import { ProjectHistoryService } from 'src/project-history/project-history.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -268,6 +269,31 @@ export class ProjectService {
         };
       });
       return result;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
+  async viewer(id: ID) {
+    try {
+      let view = 0;
+      const isProject = await this.model.findById(id).lean();
+
+      if (!isProject) {
+        throw new HttpException('Nft not fount !', HttpStatus.BAD_REQUEST);
+      }
+
+      if (isProject.viewer) {
+        view = isProject.viewer + 1;
+      }
+
+      const updatedViewer = await this.model.findByIdAndUpdate(id, {
+        viewer: view,
+      });
+
+      console.log(isProject.viewer, view);
+      return updatedViewer;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);
