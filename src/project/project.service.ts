@@ -198,13 +198,6 @@ export class ProjectService {
             localField: 'likes',
             foreignField: '_id',
             pipeline: [
-              // {
-              //   $match: {
-              //     $expr: {
-              //       $eq: ['$_id', { $toObjectId: id }],
-              //     },
-              //   },
-              // },
               {
                 $lookup: {
                   from: 'nfts',
@@ -216,23 +209,49 @@ export class ProjectService {
               {
                 $unwind: '$nfts',
               },
+              {
+                $group: {
+                  _id: '$_id',
+                  total: { $sum: '$nfts.price' },
+                },
+              },
             ],
             as: 'users',
           },
         },
-        {
-          $unwind: '$users',
-        },
-        {
-          $group: {
-            _id: '$users._id',
-            mineValue: {
-              $sum: '$users.nfts.price',
-            },
-          },
-        },
+        // {
+        //   $unwind: '$users',
+        // },
+        // {
+        //   $group: {
+        //     _id: '$users._id',
+        //     mineValue: {
+        //       $sum: '$users.nfts.price',
+        //     },
+        //   },
+        // },
       ]);
-      return data;
+      let result = data.filter((item) => item.users.length > 0);
+      result = result.filter((item) => {
+        let rs = false;
+        item.users.forEach((like) => {
+          if (like._id.toString() === id.toString()) {
+            rs = true;
+          }
+        });
+        return rs;
+      });
+      result = result.map((item) => {
+        let total = 0;
+        item.users.forEach((like) => {
+          total += +like.total;
+        });
+        return {
+          ...item,
+          total,
+        };
+      });
+      return result;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);
