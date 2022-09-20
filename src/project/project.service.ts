@@ -303,6 +303,14 @@ export class ProjectService {
             as: 'users',
           },
         },
+        {
+          $lookup: {
+            from: 'projecthistories',
+            localField: '_id',
+            foreignField: 'project',
+            as: 'projecthistories',
+          },
+        },
       ]);
       return data;
     } catch (error) {
