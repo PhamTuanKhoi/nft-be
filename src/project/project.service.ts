@@ -258,6 +258,43 @@ export class ProjectService {
     }
   }
 
+  async detail(id: string) {
+    try {
+      const data = await this.model.aggregate([
+        {
+          $match: {
+            $expr: {
+              $eq: ['$_id', { $toObjectId: id }],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'problemcategories',
+            localField: 'problemCategory',
+            foreignField: '_id',
+            as: 'problemCategory',
+          },
+        },
+        {
+          $unwind: '$problemCategory',
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'likes',
+            foreignField: '_id',
+            as: 'users',
+          },
+        },
+      ]);
+      return data;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   findOne(id: string) {
     try {
       return this.model.findById(id).populate('problemCategory');

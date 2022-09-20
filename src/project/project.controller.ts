@@ -46,6 +46,11 @@ export class ProjectController {
     return await this.projectService.mineValue(id);
   }
 
+  @Get('detail/:id')
+  detail(@Param('id') id: string) {
+    return this.projectService.detail(id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.projectService.findOne(id);
