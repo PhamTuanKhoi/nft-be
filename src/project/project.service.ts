@@ -292,7 +292,7 @@ export class ProjectService {
         viewer: view,
       });
 
-      console.log(isProject.viewer, view);
+      // console.log(isProject.viewer, view);
       return updatedViewer;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
