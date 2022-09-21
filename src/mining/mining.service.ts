@@ -21,7 +21,7 @@ export class MiningService {
         ...tmp,
         {
           $match: {
-            name: { $regex: '.*' + query.search + '.*', $options: 'i' },
+            levelName: { $regex: '.*' + query.search + '.*', $options: 'i' },
           },
         },
       ];
@@ -58,8 +58,8 @@ export class MiningService {
       query.page > 0
     ) {
       findQuery = findQuery
-        .limit(query.limit)
-        .skip((query.page - 1) * query.limit);
+        .skip((query.page - 1) * query.limit)
+        .limit(query.limit);
     }
     const result = await findQuery.exec();
     return {

@@ -68,6 +68,7 @@ export class NftService {
         $unwind: '$mining',
       },
     ];
+
     if (query.level) {
       tmp = [
         ...tmp,
@@ -78,13 +79,14 @@ export class NftService {
         },
       ];
     }
+
     if (query.collectionid) {
       tmp = [
         ...tmp,
         {
           $match: {
             $expr: {
-              $eq: ['$collectionNft', { $toObjectId: query.collectionid }],
+              $eq: ['$collectionNft._id', { $toObjectId: query.collectionid }],
             },
           },
         },
