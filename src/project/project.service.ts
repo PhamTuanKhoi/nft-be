@@ -298,7 +298,7 @@ export class ProjectService {
         throw new HttpException('Nft not fount !', HttpStatus.BAD_REQUEST);
       }
 
-      if (isProject.viewer) {
+      if (isProject) {
         view = isProject.viewer + 1;
       }
 
@@ -350,6 +350,17 @@ export class ProjectService {
             foreignField: 'project',
             as: 'projecthistories',
           },
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'creater',
+            foreignField: '_id',
+            as: 'creator',
+          },
+        },
+        {
+          $unwind: '$creator',
         },
       ]);
       return data;
