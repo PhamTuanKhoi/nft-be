@@ -10,6 +10,7 @@ import {
 import { prop, ReturnModelType } from '@typegoose/typegoose';
 import { Console } from 'console';
 import { InjectModel } from 'nestjs-typegoose';
+import { CollectionService } from 'src/collection/collection.service';
 import { ID } from 'src/global/interfaces/id.interface';
 import { PaginateResponse } from 'src/global/interfaces/paginate.interface';
 import { MiningService } from 'src/mining/mining.service';
@@ -25,6 +26,8 @@ export class NftService {
     @InjectModel(NFT) private readonly model: ReturnModelType<typeof NFT>,
     @Inject(forwardRef(() => MiningService))
     private readonly miningService: MiningService,
+    @Inject(forwardRef(() => CollectionService))
+    private readonly collectionService: CollectionService,
   ) {}
 
   get = async (query: QueryNftDto): Promise<PaginateResponse<NFT>> => {
@@ -469,7 +472,7 @@ export class NftService {
     }
   };
 
-  delete = async (id: ID): Promise<NFT> => {
+  delete = async (id: ID, coll: string): Promise<NFT> => {
     const idNft = await this.model.findById(id);
     if (idNft.level > 1) {
       throw new HttpException(
@@ -477,6 +480,9 @@ export class NftService {
         HttpStatus.BAD_REQUEST,
       );
     }
+
+    // un nft coll
+    await this.collectionService.unNft(coll, id.toString());
     return await this.model.findByIdAndDelete(id);
   };
 }
