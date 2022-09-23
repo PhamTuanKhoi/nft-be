@@ -42,9 +42,11 @@ export class ProjectService {
     }
   }
 
-  async LikeProjects(id, idproject) {
+  async LikeProjects(id, idproject, payload: { power: any }) {
+    console.log(payload.power);
+    // console.log(id, idproject, payload);
     const iduser = id;
-    const nft = await this.model.findById(idproject);
+    const nft: any = await this.model.findById(idproject);
     const likes = nft?.likes ? nft?.likes : [];
     if (!nft) {
       throw new HttpException(
@@ -62,6 +64,17 @@ export class ProjectService {
         { new: true },
       );
 
+      //load history
+      const history = await this.projectHistoryService.findOne(
+        iduser,
+        idproject,
+      );
+
+      let subtract = +nft.power - +history.power;
+      await this.model.findByIdAndUpdate(idproject, {
+        power: JSON.stringify(subtract),
+      });
+
       await this.projectHistoryService.unLikeHistory(iduser, idproject);
 
       return data;
@@ -78,6 +91,7 @@ export class ProjectService {
         user: iduser,
         project: idproject,
         datelike: new Date().getTime(),
+        power: payload.power,
       });
 
       return data;
@@ -284,7 +298,7 @@ export class ProjectService {
         throw new HttpException('Nft not fount !', HttpStatus.BAD_REQUEST);
       }
 
-      if (isProject.viewer) {
+      if (isProject) {
         view = isProject.viewer + 1;
       }
 
@@ -336,6 +350,17 @@ export class ProjectService {
             foreignField: 'project',
             as: 'projecthistories',
           },
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'creater',
+            foreignField: '_id',
+            as: 'creator',
+          },
+        },
+        {
+          $unwind: '$creator',
         },
       ]);
       return data;

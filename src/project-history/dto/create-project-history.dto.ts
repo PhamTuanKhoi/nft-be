@@ -9,4 +9,7 @@ export class CreateProjectHistoryDto {
 
   @IsOptional()
   project: string;
+
+  @IsOptional()
+  power: number;
 }

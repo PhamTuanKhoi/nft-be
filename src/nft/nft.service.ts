@@ -68,7 +68,6 @@ export class NftService {
         $unwind: '$mining',
       },
     ];
-
     if (query.level) {
       tmp = [
         ...tmp,
@@ -230,7 +229,6 @@ export class NftService {
         },
       ];
     }
-
     let findQuery = this.model.aggregate(tmp);
     const count = (await findQuery.exec()).length;
     if (

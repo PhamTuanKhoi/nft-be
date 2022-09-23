@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ProjectHistoryService } from './project-history.service';
 import { CreateProjectHistoryDto } from './dto/create-project-history.dto';
 import { UpdateProjectHistoryDto } from './dto/update-project-history.dto';
@@ -19,11 +27,14 @@ export class ProjectHistoryController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.projectHistoryService.findOne(+id);
+    return this.projectHistoryService.findById(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProjectHistoryDto: UpdateProjectHistoryDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateProjectHistoryDto: UpdateProjectHistoryDto,
+  ) {
     return this.projectHistoryService.update(+id, updateProjectHistoryDto);
   }
 

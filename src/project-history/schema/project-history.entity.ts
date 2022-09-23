@@ -11,4 +11,7 @@ export class ProjectHistory {
 
   @prop({ ref: () => Project })
   project: Ref<Project>;
+
+  @prop()
+  power: number;
 }

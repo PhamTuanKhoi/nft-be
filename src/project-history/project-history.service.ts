@@ -30,16 +30,28 @@ export class ProjectHistoryService {
     }
   }
 
+  async findById(id: string) {
+    try {
+      return await this.model.findById(id).lean();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async findOne(user: string, project: string) {
+    try {
+      return await this.model.findOne({ user, project });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   create(createProjectHistoryDto: CreateProjectHistoryDto) {
     return 'This action adds a new projectHistory';
   }
 
   findAll() {
     return `This action returns all projectHistory`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} projectHistory`;
   }
 
   update(id: number, updateProjectHistoryDto: UpdateProjectHistoryDto) {
