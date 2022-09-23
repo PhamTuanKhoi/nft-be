@@ -68,8 +68,8 @@ export class NftController {
   }
   // PATCH: /v1/nfts/:id
   // uppdate nft by id
-  @Delete(':id')
-  async delete(@Param('id') id: ID) {
-    return this.service.delete(id);
+  @Delete(':id/:coll')
+  async delete(@Param('id') id: ID, @Param('coll') coll: string) {
+    return this.service.delete(id, coll);
   }
 }

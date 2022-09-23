@@ -540,4 +540,22 @@ export class CollectionService {
   async remove(id: ID): Promise<Collection> {
     return this.model.findByIdAndRemove(id);
   }
+
+  async unNft(id: string, nft: string): Promise<Collection> {
+    try {
+      const collection = await this.model.findById(id).lean();
+
+      let arrNfts = collection.nfts;
+
+      return await this.model.findByIdAndUpdate(
+        id,
+        {
+          nfts: arrNfts.filter((i) => i.toString() !== nft.toString()),
+        },
+        { new: true },
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
