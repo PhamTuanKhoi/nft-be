@@ -265,12 +265,33 @@ export class UserService {
           },
         },
         {
+          $lookup: {
+            from: 'winers',
+            localField: '_id',
+            foreignField: 'user',
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $eq: [
+                      '$badges',
+                      { $toObjectId: '632e30e126fd4d643573e211' },
+                    ],
+                  },
+                },
+              },
+            ],
+            as: 'winers',
+          },
+        },
+        {
           $project: {
             displayName: '$displayName',
             avatar: '$avatar',
             squadImage: '$squadImage',
             squadName: '$squadName',
             nfts: '$nfts',
+            winers: '$winers',
           },
         },
         {
@@ -282,6 +303,7 @@ export class UserService {
               squadImage: '$squadImage',
               squadName: '$squadName',
               nfts: '$nfts',
+              winers: '$winers',
             },
           },
         },
@@ -294,10 +316,13 @@ export class UserService {
             nfts: '$_id.nfts',
             squadImage: '$_id.squadImage',
             squadName: '$_id.squadName',
+            winers: '$_id.winers',
             valuePower: '',
           },
         },
       ]);
+
+      // console.log(users);
       //push toatal
       data.map((item1) => {
         users.map((item2) => {

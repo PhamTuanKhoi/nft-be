@@ -416,6 +416,18 @@ export class NftService {
     }
   }
 
+  async verify(id: string, verify) {
+    try {
+      const isVerified = await this.model.findByIdAndUpdate(id, verify, {
+        new: true,
+      });
+      return isVerified;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   update = async (id: ID, nft: UpdateNftDto): Promise<NFT> => {
     try {
       const updatedNft = await this.model

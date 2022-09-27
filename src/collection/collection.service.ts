@@ -442,6 +442,7 @@ export class CollectionService {
               nameSubcollection: '$name',
               imageSubcollection: '$image',
               descriptionSubcollection: '$symbol',
+              likes: '$likes',
               nfts: '$nfts',
             },
           },
@@ -453,12 +454,90 @@ export class CollectionService {
             nameSubcollection: '$_id.nameSubcollection',
             imageSubcollection: '$_id.imageSubcollection',
             descriptionSubcollection: '$_id.descriptionSubcollection',
+            likes: '$_id.likes',
             nfts: '$_id.nfts',
+            totalPrice: '',
           },
         },
       ];
 
-      return this.model.aggregate(pipeline);
+      const totalPrice = await this.model.aggregate([
+        {
+          $match: {
+            $expr: {
+              $eq: ['$_id', { $toObjectId: id }],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: '_id',
+            foreignField: 'collectionNft',
+            pipeline: [
+              {
+                $match: {
+                  imported: true,
+                },
+              },
+              {
+                $lookup: {
+                  from: 'minings',
+                  let: {
+                    levelNft: '$level',
+                  },
+                  pipeline: [
+                    {
+                      $match: {
+                        $expr: {
+                          $and: [{ $eq: ['$level', '$$levelNft'] }],
+                        },
+                      },
+                    },
+                  ],
+                  as: 'mining',
+                },
+              },
+              {
+                $unwind: '$mining',
+              },
+            ],
+            as: 'nfts',
+          },
+        },
+        {
+          $unwind: '$nfts',
+        },
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+            },
+            totalPrice: {
+              $sum: '$nfts.mining.price',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            id: '$_id.id',
+            totalPrice: '$totalPrice',
+          },
+        },
+      ]);
+
+      const data = await this.model.aggregate(pipeline);
+
+      data.map((item1) => {
+        totalPrice.map((item2) => {
+          if (item1.id.toString() === item2.id.toString()) {
+            item1.totalPrice = item2.totalPrice;
+          }
+        });
+      });
+
+      return data;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);
