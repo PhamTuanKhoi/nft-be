@@ -46,6 +46,11 @@ export class UserController {
   //   return await this.service.value(id);
   // }
 
+  @Get('squad-power/:id')
+  async squadPower(@Param('id') id: string) {
+    return await this.service.squadPower(id);
+  }
+
   @Get('squad')
   async squad() {
     return await this.service.squad();

@@ -203,6 +203,56 @@ export class UserService {
   //   }
   // }
 
+  async squadPower(id: string) {
+    try {
+      const data = await this.model.aggregate([
+        {
+          $match: {
+            $expr: {
+              $eq: ['$_id', { $toObjectId: id }],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: '_id',
+            foreignField: 'owner',
+            as: 'nfts',
+          },
+        },
+        {
+          $unwind: '$nfts',
+        },
+        {
+          $project: {
+            nfts: '$nfts',
+          },
+        },
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+            },
+            total: {
+              $sum: '$nfts.total',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            userid: '$_id.id',
+            total: '$total',
+          },
+        },
+      ]);
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   async squad() {
     try {
       const data = await this.model.aggregate([
@@ -265,12 +315,33 @@ export class UserService {
           },
         },
         {
+          $lookup: {
+            from: 'winers',
+            localField: '_id',
+            foreignField: 'user',
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $eq: [
+                      '$badges',
+                      { $toObjectId: '632e30e126fd4d643573e211' },
+                    ],
+                  },
+                },
+              },
+            ],
+            as: 'winers',
+          },
+        },
+        {
           $project: {
             displayName: '$displayName',
             avatar: '$avatar',
             squadImage: '$squadImage',
             squadName: '$squadName',
             nfts: '$nfts',
+            winers: '$winers',
           },
         },
         {
@@ -282,6 +353,7 @@ export class UserService {
               squadImage: '$squadImage',
               squadName: '$squadName',
               nfts: '$nfts',
+              winers: '$winers',
             },
           },
         },
@@ -294,10 +366,13 @@ export class UserService {
             nfts: '$_id.nfts',
             squadImage: '$_id.squadImage',
             squadName: '$_id.squadName',
+            winers: '$_id.winers',
             valuePower: '',
           },
         },
       ]);
+
+      // console.log(users);
       //push toatal
       data.map((item1) => {
         users.map((item2) => {

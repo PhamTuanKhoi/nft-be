@@ -54,6 +54,10 @@ export class NftController {
     return this.service.create(nft);
   }
 
+  @Patch('verify/:id')
+  async verify(@Param('id') id: string, @Body() verify: boolean) {
+    return this.service.verify(id, verify);
+  }
   // PATCH: /v1/nfts/:id
   // uppdate nft by id
   @Patch('updated/:id')

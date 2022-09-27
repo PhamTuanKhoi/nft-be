@@ -56,4 +56,7 @@ export class NFT extends BaseModel {
 
   @prop({ default: false })
   imported: boolean;
+
+  @prop({ default: false })
+  verify: boolean;
 }
