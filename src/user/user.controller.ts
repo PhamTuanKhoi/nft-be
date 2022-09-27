@@ -52,8 +52,8 @@ export class UserController {
   }
 
   @Get('squad')
-  async squad() {
-    return await this.service.squad();
+  async squad(@Query() query: { id: string }) {
+    return await this.service.squad(query);
   }
 
   @Get('mined-value/:id')
