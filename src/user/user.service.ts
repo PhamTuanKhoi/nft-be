@@ -247,14 +247,28 @@ export class UserService {
           },
         },
       ]);
+      return data;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);
     }
   }
 
-  async squad() {
+  async squad(query: { id: string }) {
+    // console.log(query.id);
     try {
+      let pipeline: any = [];
+
+      if (query.id) {
+        pipeline.push({
+          $match: {
+            $expr: {
+              $eq: ['$badges', { $toObjectId: query.id }],
+            },
+          },
+        });
+      }
+
       const data = await this.model.aggregate([
         {
           $match: {
@@ -319,18 +333,7 @@ export class UserService {
             from: 'winers',
             localField: '_id',
             foreignField: 'user',
-            pipeline: [
-              {
-                $match: {
-                  $expr: {
-                    $eq: [
-                      '$badges',
-                      { $toObjectId: '632e30e126fd4d643573e211' },
-                    ],
-                  },
-                },
-              },
-            ],
+            pipeline: pipeline,
             as: 'winers',
           },
         },
@@ -340,6 +343,7 @@ export class UserService {
             avatar: '$avatar',
             squadImage: '$squadImage',
             squadName: '$squadName',
+            power: '$power',
             nfts: '$nfts',
             winers: '$winers',
           },
@@ -352,6 +356,7 @@ export class UserService {
               avatar: '$avatar',
               squadImage: '$squadImage',
               squadName: '$squadName',
+              power: '$power',
               nfts: '$nfts',
               winers: '$winers',
             },
@@ -366,6 +371,7 @@ export class UserService {
             nfts: '$_id.nfts',
             squadImage: '$_id.squadImage',
             squadName: '$_id.squadName',
+            power: '$_id.power',
             winers: '$_id.winers',
             valuePower: '',
           },
@@ -383,6 +389,23 @@ export class UserService {
       });
       //xx
       users.sort((a, b) => b.valuePower - a.valuePower);
+
+      if (query.id) {
+        let result = users.filter(
+          (item) => item.valuePower !== '' && item.winers.length > 0,
+        );
+
+        if (result?.length > 0) {
+          let max_val = result.reduce((accumulator, element) => {
+            return accumulator.valuePower > element.valuePower
+              ? accumulator
+              : element;
+          });
+          return [max_val];
+        }
+
+        return result;
+      }
 
       return users.filter((item) => item.valuePower !== '');
     } catch (error) {
