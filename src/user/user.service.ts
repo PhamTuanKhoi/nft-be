@@ -203,6 +203,56 @@ export class UserService {
   //   }
   // }
 
+  async squadPower(id: string) {
+    try {
+      const data = await this.model.aggregate([
+        {
+          $match: {
+            $expr: {
+              $eq: ['$_id', { $toObjectId: id }],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: '_id',
+            foreignField: 'owner',
+            as: 'nfts',
+          },
+        },
+        {
+          $unwind: '$nfts',
+        },
+        {
+          $project: {
+            nfts: '$nfts',
+          },
+        },
+        {
+          $group: {
+            _id: {
+              id: '$_id',
+            },
+            total: {
+              $sum: '$nfts.total',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            userid: '$_id.id',
+            total: '$total',
+          },
+        },
+      ]);
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   async squad() {
     try {
       const data = await this.model.aggregate([
