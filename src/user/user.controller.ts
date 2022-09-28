@@ -41,6 +41,10 @@ export class UserController {
     return await this.service.ranking(query);
   }
 
+  @Get('owner-nft/:id')
+  async ownerNft(@Param('id') id: string) {
+    return await this.service.ownerNft(id);
+  }
   // @Get('mined-value')
   // async value(@Param('id') id: string) {
   //   return await this.service.value(id);
