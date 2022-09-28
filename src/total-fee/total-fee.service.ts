@@ -14,10 +14,6 @@ export class TotalFeeService {
     private readonly model: ReturnModelType<typeof TotalFee>,
   ) {}
 
-  create(createTotalFeeDto: CreateTotalFeeDto) {
-    return 'This action adds a new totalFee';
-  }
-
   async findAll(query: QueryTotalFreeDto) {
     try {
       let tmp: any = [];
@@ -68,15 +64,26 @@ export class TotalFeeService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} totalFee`;
+  async createAndUpdateGas(query: { gas: number }) {
+    try {
+      const data = await this.model.find();
+
+      if (data.length > 0) {
+        let gas = +data[0].gas + +query.gas;
+        return await this.update(data[0]?._id, { gas });
+      }
+
+      return this.model.create({ gas: query.gas });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  update(id: number, updateTotalFeeDto: UpdateTotalFeeDto) {
-    return `This action updates a #${id} totalFee`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} totalFee`;
+  async update(id: string, payload) {
+    try {
+      return this.model.findByIdAndUpdate(id, payload);
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
