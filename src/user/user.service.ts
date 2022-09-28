@@ -203,6 +203,63 @@ export class UserService {
   //   }
   // }
 
+  async ownerNft(id: string) {
+    try {
+      return await this.model.aggregate([
+        {
+          $match: {
+            $expr: {
+              $eq: ['$_id', { $toObjectId: id }],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'nfts',
+            localField: '_id',
+            foreignField: 'owner',
+            pipeline: [
+              {
+                $lookup: {
+                  from: 'minings',
+                  let: {
+                    levelNft: '$level',
+                  },
+                  pipeline: [
+                    {
+                      $match: {
+                        $expr: { $eq: ['$level', '$$levelNft'] },
+                      },
+                    },
+                  ],
+                  as: 'mining',
+                },
+              },
+              {
+                $unwind: '$mining',
+              },
+              {
+                $lookup: {
+                  from: 'collections',
+                  localField: 'collectionNft',
+                  foreignField: '_id',
+                  as: 'collection',
+                },
+              },
+              {
+                $unwind: '$collection',
+              },
+            ],
+            as: 'nfts',
+          },
+        },
+      ]);
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   async squadPower(id: string) {
     try {
       const data = await this.model.aggregate([
