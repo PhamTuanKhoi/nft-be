@@ -1,8 +1,9 @@
 import { prop, Ref } from '@typegoose/typegoose';
+import { BaseModel } from 'src/global/base.model';
 import { Project } from 'src/project/schema/project.schema';
 import { User } from 'src/user/schemas/user.schema';
 
-export class ProjectHistory {
+export class ProjectHistory extends BaseModel {
   @prop()
   datelike: number;
 
