@@ -1,7 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { TotalFeeService } from './total-fee.service';
 import { CreateTotalFeeDto } from './dto/create-total-fee.dto';
 import { UpdateTotalFeeDto } from './dto/update-total-fee.dto';
+import { QueryTotalFreeDto } from './dto/query-total-fee.dto';
 
 @Controller('total-fee')
 export class TotalFeeController {
@@ -13,8 +23,8 @@ export class TotalFeeController {
   }
 
   @Get()
-  findAll() {
-    return this.totalFeeService.findAll();
+  findAll(@Query() query: QueryTotalFreeDto) {
+    return this.totalFeeService.findAll(query);
   }
 
   @Get(':id')
@@ -23,7 +33,10 @@ export class TotalFeeController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTotalFeeDto: UpdateTotalFeeDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateTotalFeeDto: UpdateTotalFeeDto,
+  ) {
     return this.totalFeeService.update(+id, updateTotalFeeDto);
   }
 
