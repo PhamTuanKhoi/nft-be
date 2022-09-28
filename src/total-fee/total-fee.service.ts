@@ -64,6 +64,14 @@ export class TotalFeeService {
     }
   }
 
+  async list() {
+    try {
+      return await this.model.find();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async createAndUpdateGas(query: { gas: number }) {
     try {
       const data = await this.model.find();

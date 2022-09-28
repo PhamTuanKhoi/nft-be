@@ -22,6 +22,11 @@ export class TotalFeeController {
     return this.totalFeeService.findAll(query);
   }
 
+  @Get('list')
+  list() {
+    return this.totalFeeService.list();
+  }
+
   @Get('gas')
   createAndUpdateGas(@Query() query: { gas: number }) {
     return this.totalFeeService.createAndUpdateGas(query);
