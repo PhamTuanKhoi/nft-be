@@ -17,6 +17,7 @@ import { ProjectModule } from './project/project.module';
 import { BadgesModule } from './badges/badges.module';
 import { WinerModule } from './winer/winer.module';
 import { ProjectHistoryModule } from './project-history/project-history.module';
+import { TotalFeeModule } from './total-fee/total-fee.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -35,6 +36,7 @@ import { ProjectHistoryModule } from './project-history/project-history.module';
     BadgesModule,
     WinerModule,
     ProjectHistoryModule,
+    TotalFeeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
