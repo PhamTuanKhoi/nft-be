@@ -8,8 +8,9 @@ import {
   Logger,
 } from '@nestjs/common';
 import { prop, ReturnModelType } from '@typegoose/typegoose';
-import { Console } from 'console';
+import { CronJob } from 'cron';
 import { InjectModel } from 'nestjs-typegoose';
+import schedule from 'node-schedule';
 import { CollectionService } from 'src/collection/collection.service';
 import { ID } from 'src/global/interfaces/id.interface';
 import { PaginateResponse } from 'src/global/interfaces/paginate.interface';
@@ -443,41 +444,73 @@ export class NftService {
     }
   };
 
-  updateTotalPrice = async (id: ID, nft: UpdateNftDto): Promise<NFT> => {
+  updateTotalPrice = async (id: ID, nft: UpdateNftDto) => {
     try {
-      let priced = 0;
-      const isNft = await this.getById(id);
+      console.log('next');
+      //get date
+      let date = new Date(nft.endTime);
 
-      if (!isNft) {
-        throw new HttpException('Nft not fount !', HttpStatus.BAD_REQUEST);
-      }
+      let seconds = date.getSeconds();
+      let minute = date.getMinutes();
+      let hour = date.getHours();
+      let day = date.getDate();
+      let month = date.getMonth() + 1;
+      // let year = date.getFullYear();
+      console.log({
+        day: day,
+        seconds: seconds,
+        minute: minute,
+        hour: hour,
+        month: month,
+      });
+      // console.log(schedule);
+      // schedule.scheduleJob(date, function () {
+      //   console.log('The world is going to end today.');
+      // });
 
-      const Mining = await this.miningService.getByLevel(nft.level - 1);
+      const job = new CronJob(date, () => {
+        // seconds = '-1';
+        this.logger.warn(`time (${seconds}) for job ${'test'} to run!`);
+        console.log('ok pro');
+      });
 
-      if (!Mining) {
-        throw new HttpException('Mining not fount !', HttpStatus.BAD_REQUEST);
-      }
+      // this.model.addCronJob('mint', job);
 
-      if (Mining) {
-        priced = Mining.price;
-        nft.price = Mining.price;
-      }
+      job.start();
 
-      if (isNft) {
-        nft.total = isNft.price + priced;
-      }
+      // let priced = 0;
+      // const isNft = await this.getById(id);
 
-      const updatedNft = await this.model
-        .findByIdAndUpdate(
-          id,
-          { ...nft, level: nft.level >= 6 ? 6 : nft.level },
-          { new: true },
-        )
-        .populate('creator')
-        .populate('owner')
-        .populate('collectionNft');
-      this.logger.log(`updated total price a nft by id#${updatedNft?._id}`);
-      return updatedNft;
+      // if (!isNft) {
+      //   throw new HttpException('Nft not fount !', HttpStatus.BAD_REQUEST);
+      // }
+
+      // const Mining = await this.miningService.getByLevel(nft.level - 1);
+
+      // if (!Mining) {
+      //   throw new HttpException('Mining not fount !', HttpStatus.BAD_REQUEST);
+      // }
+
+      // if (Mining) {
+      //   priced = Mining.price;
+      //   nft.price = Mining.price;
+      // }
+
+      // if (isNft) {
+      //   nft.total = isNft.price + priced;
+      // }
+
+      // const updatedNft = await this.model
+      //   .findByIdAndUpdate(
+      //     id,
+      //     { ...nft, level: nft.level >= 6 ? 6 : nft.level },
+      //     { new: true },
+      //   )
+      //   .populate('creator')
+      //   .populate('owner')
+      //   .populate('collectionNft');
+      // this.logger.log(`updated total price a nft by id#${updatedNft?._id}`);
+      // return updatedNft;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);
