@@ -8,8 +8,9 @@ import {
   Logger,
 } from '@nestjs/common';
 import { prop, ReturnModelType } from '@typegoose/typegoose';
-import { Console } from 'console';
+import { CronJob } from 'cron';
 import { InjectModel } from 'nestjs-typegoose';
+import schedule from 'node-schedule';
 import { CollectionService } from 'src/collection/collection.service';
 import { ID } from 'src/global/interfaces/id.interface';
 import { PaginateResponse } from 'src/global/interfaces/paginate.interface';
@@ -443,41 +444,66 @@ export class NftService {
     }
   };
 
-  updateTotalPrice = async (id: ID, nft: UpdateNftDto): Promise<NFT> => {
+  updateTotalPrice = async (id: ID, nft: UpdateNftDto) => {
     try {
-      let priced = 0;
-      const isNft = await this.getById(id);
+      //get date
+      let date = new Date(nft.endTime);
 
-      if (!isNft) {
-        throw new HttpException('Nft not fount !', HttpStatus.BAD_REQUEST);
-      }
+      this.logger.warn(
+        date.getSeconds(),
+        date.getMinutes(),
+        date.getHours(),
+        date.getDate(),
+        date.getMonth(),
+        date.getFullYear(),
+      );
 
-      const Mining = await this.miningService.getByLevel(nft.level - 1);
+      const job = new CronJob(date, async () => {
+        let priced = 0;
+        const isNft = await this.getById(id);
 
-      if (!Mining) {
-        throw new HttpException('Mining not fount !', HttpStatus.BAD_REQUEST);
-      }
+        if (!isNft) {
+          throw new HttpException('Nft not fount !', HttpStatus.BAD_REQUEST);
+        }
 
-      if (Mining) {
-        priced = Mining.price;
-        nft.price = Mining.price;
-      }
+        const Mining = await this.miningService.getByLevel(nft.level);
 
-      if (isNft) {
-        nft.total = isNft.price + priced;
-      }
+        if (!Mining) {
+          throw new HttpException('Mining not fount !', HttpStatus.BAD_REQUEST);
+        }
 
-      const updatedNft = await this.model
-        .findByIdAndUpdate(
-          id,
-          { ...nft, level: nft.level >= 6 ? 6 : nft.level },
-          { new: true },
-        )
-        .populate('creator')
-        .populate('owner')
-        .populate('collectionNft');
-      this.logger.log(`updated total price a nft by id#${updatedNft?._id}`);
-      return updatedNft;
+        if (Mining) {
+          priced = Mining.price;
+          nft.price = Mining.price;
+        }
+
+        if (isNft) {
+          nft.total = isNft.price + priced;
+        }
+
+        const updatedNft = await this.model
+          .findByIdAndUpdate(
+            id,
+            { ...nft, level: nft.level >= 6 ? 6 : nft.level },
+            { new: true },
+          )
+          .populate('creator')
+          .populate('owner')
+          .populate('collectionNft');
+
+        this.logger.log(`updated total price a nft by id#${updatedNft?._id}`);
+        return updatedNft;
+      });
+      //start job
+      job.start();
+
+      const updateEnTime = await this.model.findByIdAndUpdate(
+        id,
+        { endTime: nft.endTime, owner: nft.owner },
+        { new: true },
+      );
+      this.logger.log(`updated edtime a nft by id#${updateEnTime?._id}`);
+      return updateEnTime;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);

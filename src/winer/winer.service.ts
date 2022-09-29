@@ -83,7 +83,27 @@ export class WinerService {
 
   async findByUser(id: string) {
     try {
-      return await this.model.find({ user: id }).populate('badges');
+      return await this.model.aggregate([
+        {
+          $match: {
+            $expr: {
+              $eq: ['$user', { $toObjectId: id }],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'badges',
+            localField: 'badges',
+            foreignField: '_id',
+            as: 'badges',
+          },
+        },
+        {
+          $unwind: '$badges',
+        },
+        { $sort: { 'badges.scores': -1 } },
+      ]);
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);

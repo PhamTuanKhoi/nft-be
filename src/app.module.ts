@@ -20,6 +20,7 @@ import { ProjectHistoryModule } from './project-history/project-history.module';
 import { TotalFeeModule } from './total-fee/total-fee.module';
 @Module({
   imports: [
+    // ScheduleModule.forRoot(),
     ConfigModule.forRoot({ isGlobal: true }),
     TypegooseModule.forRoot(process.env.MONGO),
     ScheduleModule.forRoot(),
