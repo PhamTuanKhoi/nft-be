@@ -18,4 +18,10 @@ export class ProjectHistory extends BaseModel {
 
   @prop()
   power: number;
+
+  @prop({ ref: () => User })
+  userLove: Ref<User>;
+
+  @prop({ ref: () => Project })
+  projectLove: Ref<Project>;
 }

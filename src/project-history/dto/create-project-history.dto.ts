@@ -15,4 +15,10 @@ export class CreateProjectHistoryDto {
 
   @IsOptional()
   power: number;
+
+  @IsOptional()
+  userLove: string;
+
+  @IsOptional()
+  projectLove: string;
 }

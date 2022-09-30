@@ -22,10 +22,9 @@ export class ProjectHistoryService {
     }
   }
 
-  async unLikeHistory(user: string, project: string) {
+  async unLikeHistory(userLove: string, projectLove: string) {
     try {
-      const data = await this.model.findOne({ user, project }).lean();
-      // console.log(data?._id);
+      const data = await this.model.findOne({ userLove, projectLove }).lean();
       return this.model.findByIdAndRemove(data?._id);
     } catch (error) {
       console.log(error);

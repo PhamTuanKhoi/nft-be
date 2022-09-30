@@ -65,6 +65,8 @@ export class ProjectService {
         { new: true },
       );
 
+      await this.projectHistoryService.unLikeHistory(iduser, idproject);
+
       this.logger.log(`unliked project #id${data?._id}`);
 
       return data;
@@ -76,6 +78,12 @@ export class ProjectService {
         { likes: [...likes, iduser] },
         { new: true },
       );
+
+      await this.projectHistoryService.powerHistory({
+        userLove: id,
+        projectLove: idproject,
+        date: new Date().getTime(),
+      });
 
       this.logger.log(`liked project #id${data?._id}`);
       return data;
@@ -331,7 +339,7 @@ export class ProjectService {
           $lookup: {
             from: 'projecthistories',
             localField: '_id',
-            foreignField: 'project',
+            foreignField: 'projectLove',
             as: 'projecthistories',
           },
         },
