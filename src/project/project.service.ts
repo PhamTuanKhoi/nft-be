@@ -407,9 +407,12 @@ export class ProjectService {
         power: power,
       });
 
-      await this.userService.deductedPower(voteProject.user, +reduced);
+      const user = await this.userService.deductedPower(
+        voteProject.user,
+        +reduced,
+      );
 
-      return voted;
+      return { voted, user };
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);
