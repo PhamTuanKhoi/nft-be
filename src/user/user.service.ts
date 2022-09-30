@@ -435,7 +435,6 @@ export class UserService {
         },
       ]);
 
-      // console.log(users);
       //push toatal
       data.map((item1) => {
         users.map((item2) => {
@@ -452,14 +451,14 @@ export class UserService {
           (item) => item.valuePower !== '' && item.winers.length > 0,
         );
 
-        if (result?.length > 0) {
-          let max_val = result.reduce((accumulator, element) => {
-            return accumulator.valuePower > element.valuePower
-              ? accumulator
-              : element;
-          });
-          return [max_val];
-        }
+        // if (result?.length > 0) {
+        //   let max_val = result.reduce((accumulator, element) => {
+        //     return accumulator.valuePower > element.valuePower
+        //       ? accumulator
+        //       : element;
+        //   });
+        //   return [max_val];
+        // }
 
         return result;
       }
@@ -725,6 +724,35 @@ export class UserService {
 
       const updatedPower = await this.isUpdatePower(id, { isPower });
       return updatedPower;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
+  async deductedPower(id: string, power: number): Promise<User> {
+    try {
+      const user = await this.findOwner(id);
+
+      if (!user) {
+        throw new HttpException(
+          `user not found id#${user?._id}`,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      if (user) {
+        power = +user.power - +power;
+      }
+
+      const deducted = await this.model.findByIdAndUpdate(
+        id,
+        { power },
+        { new: true },
+      );
+
+      this.logger.log(`deducted power user by #id${deducted?._id}`);
+      return deducted;
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);

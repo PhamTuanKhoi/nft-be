@@ -45,10 +45,6 @@ export class UserController {
   async ownerNft(@Param('id') id: string) {
     return await this.service.ownerNft(id);
   }
-  // @Get('mined-value')
-  // async value(@Param('id') id: string) {
-  //   return await this.service.value(id);
-  // }
 
   @Get('squad-power/:id')
   async squadPower(@Param('id') id: string) {

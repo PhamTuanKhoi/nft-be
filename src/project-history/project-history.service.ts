@@ -12,18 +12,19 @@ export class ProjectHistoryService {
     @InjectModel(ProjectHistory)
     private readonly model: ReturnModelType<typeof ProjectHistory>,
   ) {}
-  async likeHistory(updateProjectHistoryDto: UpdateProjectHistoryDto) {
+  async powerHistory(updateProjectHistoryDto: UpdateProjectHistoryDto) {
     try {
-      return this.model.create(updateProjectHistoryDto);
+      const data = await this.model.create(updateProjectHistoryDto);
+      this.logger.log('Project history created success', data?._id);
+      return data;
     } catch (error) {
       console.log(error);
     }
   }
 
-  async unLikeHistory(user: string, project: string) {
+  async unLikeHistory(userLove: string, projectLove: string) {
     try {
-      const data = await this.model.findOne({ user, project }).lean();
-      // console.log(data?._id);
+      const data = await this.model.findOne({ userLove, projectLove }).lean();
       return this.model.findByIdAndRemove(data?._id);
     } catch (error) {
       console.log(error);

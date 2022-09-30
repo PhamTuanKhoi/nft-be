@@ -5,6 +5,9 @@ export class CreateProjectHistoryDto {
   datelike: number;
 
   @IsOptional()
+  date: number;
+
+  @IsOptional()
   user: string;
 
   @IsOptional()
@@ -12,4 +15,10 @@ export class CreateProjectHistoryDto {
 
   @IsOptional()
   power: number;
+
+  @IsOptional()
+  userLove: string;
+
+  @IsOptional()
+  projectLove: string;
 }

@@ -12,6 +12,7 @@ import { InjectModel } from 'nestjs-typegoose';
 import { ID } from 'src/global/interfaces/id.interface';
 import { ProblemCategoryService } from 'src/problem-category/problem-category.service';
 import { ProjectHistoryService } from 'src/project-history/project-history.service';
+import { UserService } from 'src/user/user.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { QueryProjectDto } from './dto/query-paging.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -27,6 +28,8 @@ export class ProjectService {
     private readonly problemCategoryService: ProblemCategoryService,
     @Inject(forwardRef(() => ProjectHistoryService))
     private readonly projectHistoryService: ProjectHistoryService,
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
   ) {}
   async create(createProjectDto: CreateProjectDto) {
     try {
@@ -42,9 +45,7 @@ export class ProjectService {
     }
   }
 
-  async LikeProjects(id, idproject, payload: { power: any }) {
-    console.log(payload.power);
-    // console.log(id, idproject, payload);
+  async LikeProjects(id, idproject) {
     const iduser = id;
     const nft: any = await this.model.findById(idproject);
     const likes = nft?.likes ? nft?.likes : [];
@@ -64,18 +65,9 @@ export class ProjectService {
         { new: true },
       );
 
-      //load history
-      const history = await this.projectHistoryService.findOne(
-        iduser,
-        idproject,
-      );
-
-      let subtract = +nft.power - +history.power;
-      await this.model.findByIdAndUpdate(idproject, {
-        power: JSON.stringify(subtract),
-      });
-
       await this.projectHistoryService.unLikeHistory(iduser, idproject);
+
+      this.logger.log(`unliked project #id${data?._id}`);
 
       return data;
     }
@@ -87,13 +79,13 @@ export class ProjectService {
         { new: true },
       );
 
-      await this.projectHistoryService.likeHistory({
-        user: iduser,
-        project: idproject,
-        datelike: new Date().getTime(),
-        power: payload.power,
+      await this.projectHistoryService.powerHistory({
+        userLove: id,
+        projectLove: idproject,
+        date: new Date().getTime(),
       });
 
+      this.logger.log(`liked project #id${data?._id}`);
       return data;
     }
   }
@@ -347,7 +339,7 @@ export class ProjectService {
           $lookup: {
             from: 'projecthistories',
             localField: '_id',
-            foreignField: 'project',
+            foreignField: 'projectLove',
             as: 'projecthistories',
           },
         },
@@ -379,42 +371,48 @@ export class ProjectService {
     }
   }
 
-  async vote(id: string, voteProject) {
+  async vote(id: string, voteProject: any) {
     try {
       const vote = await this.findOne(id);
+
+      let reduced = voteProject.power;
+
       if (!vote) {
         throw new HttpException('Project not found', HttpStatus.NOT_FOUND);
-      }
-
-      if (vote.value) {
-        voteProject.value = +vote.value + +voteProject.value;
       }
 
       if (vote.power) {
         voteProject.power = +vote.power + +voteProject.power;
       }
 
-      let value =
-        +voteProject.value.toFixed(2) < 0.01
-          ? 0.01
-          : +voteProject.value.toFixed(2);
-
       let power =
-        +voteProject.power.toFixed(2) < 0.01
+        Number(parseInt(voteProject.power).toFixed(2)) < 0.01
           ? 0.01
-          : +voteProject.power.toFixed(2);
+          : Number(parseInt(voteProject.power).toFixed(2));
 
       const voted = await this.model.findByIdAndUpdate(
         id,
         {
           ...voteProject,
-          value: +value,
           power: +power,
         },
         { new: true },
       );
       this.logger.log(`voted a project by id#${voted._id}`);
-      return voted;
+
+      await this.projectHistoryService.powerHistory({
+        user: voteProject.user,
+        project: id,
+        date: new Date().getTime(),
+        power: power,
+      });
+
+      const user = await this.userService.deductedPower(
+        voteProject.user,
+        +reduced,
+      );
+
+      return { voted, user };
     } catch (error) {
       this.logger.error(error?.message, error.stack);
       throw new BadRequestException(error?.message);
