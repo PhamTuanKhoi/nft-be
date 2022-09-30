@@ -37,7 +37,7 @@ export class Project extends BaseModel {
   value: string;
 
   @prop({ default: 0 })
-  power: string;
+  power: number;
 
   @prop({ default: [] })
   followers: Ref<User>[];

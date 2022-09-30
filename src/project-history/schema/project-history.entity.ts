@@ -7,6 +7,9 @@ export class ProjectHistory extends BaseModel {
   @prop()
   datelike: number;
 
+  @prop()
+  date: number;
+
   @prop({ ref: () => User })
   user: Ref<User>;
 

@@ -69,7 +69,7 @@ export class ProjectController {
   @Patch('vote/:id')
   vote(
     @Param('id') id: string,
-    @Body() payload: { power: string; value: string },
+    @Body() payload: { power: number; user: string },
   ) {
     return this.projectService.vote(id, payload);
   }

@@ -44,7 +44,7 @@ export class CreateProjectDto {
   value: string;
 
   @IsOptional()
-  power: string;
+  power: number;
 
   //   @IsNotEmpty()
   //   @IsString()

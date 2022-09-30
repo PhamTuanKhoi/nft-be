@@ -12,9 +12,11 @@ export class ProjectHistoryService {
     @InjectModel(ProjectHistory)
     private readonly model: ReturnModelType<typeof ProjectHistory>,
   ) {}
-  async likeHistory(updateProjectHistoryDto: UpdateProjectHistoryDto) {
+  async powerHistory(updateProjectHistoryDto: UpdateProjectHistoryDto) {
     try {
-      return this.model.create(updateProjectHistoryDto);
+      const data = await this.model.create(updateProjectHistoryDto);
+      this.logger.log('Project history created success', data?._id);
+      return data;
     } catch (error) {
       console.log(error);
     }

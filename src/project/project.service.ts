@@ -43,8 +43,6 @@ export class ProjectService {
   }
 
   async LikeProjects(id, idproject, payload: { power: any }) {
-    console.log(payload.power);
-    // console.log(id, idproject, payload);
     const iduser = id;
     const nft: any = await this.model.findById(idproject);
     const likes = nft?.likes ? nft?.likes : [];
@@ -64,17 +62,6 @@ export class ProjectService {
         { new: true },
       );
 
-      //load history
-      const history = await this.projectHistoryService.findOne(
-        iduser,
-        idproject,
-      );
-
-      let subtract = +nft.power - +history.power;
-      await this.model.findByIdAndUpdate(idproject, {
-        power: JSON.stringify(subtract),
-      });
-
       await this.projectHistoryService.unLikeHistory(iduser, idproject);
 
       return data;
@@ -86,13 +73,6 @@ export class ProjectService {
         { likes: [...likes, iduser] },
         { new: true },
       );
-
-      await this.projectHistoryService.likeHistory({
-        user: iduser,
-        project: idproject,
-        datelike: new Date().getTime(),
-        power: payload.power,
-      });
 
       return data;
     }
@@ -379,41 +359,40 @@ export class ProjectService {
     }
   }
 
-  async vote(id: string, voteProject) {
+  async vote(id: string, voteProject: any) {
     try {
       const vote = await this.findOne(id);
+
       if (!vote) {
         throw new HttpException('Project not found', HttpStatus.NOT_FOUND);
-      }
-
-      if (vote.value) {
-        voteProject.value = +vote.value + +voteProject.value;
       }
 
       if (vote.power) {
         voteProject.power = +vote.power + +voteProject.power;
       }
 
-      let value =
-        +voteProject.value.toFixed(2) < 0.01
-          ? 0.01
-          : +voteProject.value.toFixed(2);
-
       let power =
-        +voteProject.power.toFixed(2) < 0.01
+        Number(parseInt(voteProject.power).toFixed(2)) < 0.01
           ? 0.01
-          : +voteProject.power.toFixed(2);
+          : Number(parseInt(voteProject.power).toFixed(2));
 
       const voted = await this.model.findByIdAndUpdate(
         id,
         {
           ...voteProject,
-          value: +value,
           power: +power,
         },
         { new: true },
       );
       this.logger.log(`voted a project by id#${voted._id}`);
+
+      await this.projectHistoryService.powerHistory({
+        user: voteProject.user,
+        project: id,
+        date: new Date().getTime(),
+        power: power,
+      });
+
       return voted;
     } catch (error) {
       this.logger.error(error?.message, error.stack);

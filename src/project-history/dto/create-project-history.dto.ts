@@ -5,6 +5,9 @@ export class CreateProjectHistoryDto {
   datelike: number;
 
   @IsOptional()
+  date: number;
+
+  @IsOptional()
   user: string;
 
   @IsOptional()
