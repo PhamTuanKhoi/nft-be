@@ -731,6 +731,35 @@ export class UserService {
     }
   }
 
+  async deductedPower(id: string, power: number): Promise<User> {
+    try {
+      const user = await this.findOwner(id);
+
+      if (!user) {
+        throw new HttpException(
+          `user not found id#${user?._id}`,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      if (user) {
+        power = +user.power - +power;
+      }
+
+      const deducted = await this.model.findByIdAndUpdate(
+        id,
+        { power },
+        { new: true },
+      );
+
+      this.logger.log(`deducted power user by #id${deducted?._id}`);
+      return deducted;
+    } catch (error) {
+      this.logger.error(error?.message, error.stack);
+      throw new BadRequestException(error?.message);
+    }
+  }
+
   async findOne(id: ID) {
     return await this.model.findById(id, { password: 0 }).exec();
   }

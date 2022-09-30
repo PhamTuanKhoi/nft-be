@@ -19,12 +19,8 @@ export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @Post('/likeProject/:id/:idNft')
-  async likeProject(
-    @Param('id') id: string,
-    @Param('idNft') idNft: string,
-    @Body() payload: { power: any },
-  ) {
-    return await this.projectService.LikeProjects(id, idNft, payload);
+  async likeProject(@Param('id') id: string, @Param('idNft') idNft: string) {
+    return await this.projectService.LikeProjects(id, idNft);
   }
   @Post()
   create(@Body() createProjectDto: CreateProjectDto) {

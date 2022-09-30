@@ -12,6 +12,7 @@ import { InjectModel } from 'nestjs-typegoose';
 import { ID } from 'src/global/interfaces/id.interface';
 import { ProblemCategoryService } from 'src/problem-category/problem-category.service';
 import { ProjectHistoryService } from 'src/project-history/project-history.service';
+import { UserService } from 'src/user/user.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { QueryProjectDto } from './dto/query-paging.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -27,6 +28,8 @@ export class ProjectService {
     private readonly problemCategoryService: ProblemCategoryService,
     @Inject(forwardRef(() => ProjectHistoryService))
     private readonly projectHistoryService: ProjectHistoryService,
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
   ) {}
   async create(createProjectDto: CreateProjectDto) {
     try {
@@ -42,7 +45,7 @@ export class ProjectService {
     }
   }
 
-  async LikeProjects(id, idproject, payload: { power: any }) {
+  async LikeProjects(id, idproject) {
     const iduser = id;
     const nft: any = await this.model.findById(idproject);
     const likes = nft?.likes ? nft?.likes : [];
@@ -62,7 +65,7 @@ export class ProjectService {
         { new: true },
       );
 
-      await this.projectHistoryService.unLikeHistory(iduser, idproject);
+      this.logger.log(`unliked project #id${data?._id}`);
 
       return data;
     }
@@ -74,6 +77,7 @@ export class ProjectService {
         { new: true },
       );
 
+      this.logger.log(`liked project #id${data?._id}`);
       return data;
     }
   }
@@ -363,6 +367,8 @@ export class ProjectService {
     try {
       const vote = await this.findOne(id);
 
+      let reduced = voteProject.power;
+
       if (!vote) {
         throw new HttpException('Project not found', HttpStatus.NOT_FOUND);
       }
@@ -392,6 +398,8 @@ export class ProjectService {
         date: new Date().getTime(),
         power: power,
       });
+
+      await this.userService.deductedPower(voteProject.user, +reduced);
 
       return voted;
     } catch (error) {
