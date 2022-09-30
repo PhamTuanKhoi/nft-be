@@ -435,7 +435,6 @@ export class UserService {
         },
       ]);
 
-      // console.log(users);
       //push toatal
       data.map((item1) => {
         users.map((item2) => {
@@ -452,14 +451,14 @@ export class UserService {
           (item) => item.valuePower !== '' && item.winers.length > 0,
         );
 
-        if (result?.length > 0) {
-          let max_val = result.reduce((accumulator, element) => {
-            return accumulator.valuePower > element.valuePower
-              ? accumulator
-              : element;
-          });
-          return [max_val];
-        }
+        // if (result?.length > 0) {
+        //   let max_val = result.reduce((accumulator, element) => {
+        //     return accumulator.valuePower > element.valuePower
+        //       ? accumulator
+        //       : element;
+        //   });
+        //   return [max_val];
+        // }
 
         return result;
       }
