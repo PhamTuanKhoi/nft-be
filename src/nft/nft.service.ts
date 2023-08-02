@@ -280,7 +280,10 @@ export class NftService {
           },
         },
         {
-          $unwind: '$creator',
+          $unwind: {
+            path: '$creator',
+            preserveNullAndEmptyArrays: true,
+          },
         },
         {
           $lookup: {
@@ -291,7 +294,10 @@ export class NftService {
           },
         },
         {
-          $unwind: '$owner',
+          $unwind: {
+            path: '$owner',
+            preserveNullAndEmptyArrays: true,
+          },
         },
         {
           $lookup: {
@@ -302,7 +308,10 @@ export class NftService {
           },
         },
         {
-          $unwind: '$collectionNft',
+          $unwind: {
+            path: '$collectionNft',
+            preserveNullAndEmptyArrays: true,
+          },
         },
         {
           $lookup: {
@@ -321,7 +330,10 @@ export class NftService {
           },
         },
         {
-          $unwind: '$mining',
+          $unwind: {
+            path: '$mining',
+            preserveNullAndEmptyArrays: true,
+          },
         },
       ]);
     } catch (error) {

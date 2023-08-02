@@ -325,7 +325,10 @@ export class ProjectService {
           },
         },
         {
-          $unwind: '$problemCategory',
+          $unwind: {
+            path: '$problemCategory',
+            preserveNullAndEmptyArrays: true,
+          },
         },
         {
           $lookup: {
@@ -352,7 +355,10 @@ export class ProjectService {
           },
         },
         {
-          $unwind: '$creator',
+          $unwind: {
+            path: '$creator',
+            preserveNullAndEmptyArrays: true,
+          },
         },
       ]);
       return data;
